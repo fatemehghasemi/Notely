@@ -1,4 +1,4 @@
-﻿namespace PersonalNotesHub.Core.Domain.Enums
+﻿namespace Notely.Core.Domain.Enums
 {
     public enum NoteColor
     {

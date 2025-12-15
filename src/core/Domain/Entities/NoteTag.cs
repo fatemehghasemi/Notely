@@ -1,4 +1,4 @@
-﻿namespace PersonalNotesHub.Core.Domain.Entities;
+﻿namespace Notely.Core.Domain.Entities;
 
 public sealed class NoteTag
 {

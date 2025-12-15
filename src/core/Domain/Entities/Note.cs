@@ -1,7 +1,7 @@
-﻿using PersonalNotesHub.Core.Domain.Common;
-using PersonalNotesHub.Core.Domain.Enums;
+﻿using Notely.Core.Domain.Common;
+using Notely.Core.Domain.Enums;
 
-namespace PersonalNotesHub.Core.Domain.Entities;
+namespace Notely.Core.Domain.Entities;
 
 public sealed class Note : AuditableEntity<Guid>
 {
@@ -12,7 +12,7 @@ public sealed class Note : AuditableEntity<Guid>
 
   public bool IsPinned { get; set; }
 
-  public int? CategoryId { get; set; }
+  public Guid? CategoryId { get; set; }
   public Category? Category { get; set; }
 
   public ICollection<NoteTag> NoteTags { get; set; } = new HashSet<NoteTag>();

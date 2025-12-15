@@ -1,4 +1,4 @@
-﻿namespace PersonalNotesHub.Core.Domain.Common;
+﻿namespace Notely.Core.Domain.Common;
 
 public abstract class BaseEntity<TId>
 {
