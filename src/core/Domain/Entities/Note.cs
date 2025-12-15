@@ -3,7 +3,7 @@ using PersonalNotesHub.Core.Domain.Enums;
 
 namespace PersonalNotesHub.Core.Domain.Entities;
 
-public class Note : AuditableEntity<Guid>
+public sealed class Note : AuditableEntity<Guid>
 {
   public string Title { get; set; } = string.Empty;
   public string Content { get; set; } = string.Empty;

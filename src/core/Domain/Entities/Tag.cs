@@ -2,7 +2,7 @@
 
 namespace PersonalNotesHub.Core.Domain.Entities;
 
-public class Tag : BaseEntity<Guid>
+public sealed class Tag : BaseEntity<Guid>
 {
   public string Name { get; set; } = string.Empty;
   public ICollection<NoteTag> NoteTags { get; set; } = new HashSet<NoteTag>();

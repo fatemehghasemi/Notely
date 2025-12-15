@@ -1,6 +1,6 @@
 ﻿namespace PersonalNotesHub.Core.Domain.Entities;
 
-public class NoteTag
+public sealed class NoteTag
 {
   public Guid NoteId { get; set; }
   public Note Note { get; set; } = null!;
