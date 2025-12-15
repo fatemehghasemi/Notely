@@ -1,4 +1,4 @@
-﻿namespace PersonalNotesHub.Core.Domain.Enum
+﻿namespace PersonalNotesHub.Core.Domain.Enums
 {
     public enum NoteColor
     {

@@ -1,5 +1,5 @@
 ﻿using PersonalNotesHub.Core.Domain.Common;
-using PersonalNotesHub.Core.Domain.Enum;
+using PersonalNotesHub.Core.Domain.Enums;
 
 namespace PersonalNotesHub.Core.Domain.Entities;
 
