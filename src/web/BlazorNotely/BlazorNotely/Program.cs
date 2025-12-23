@@ -16,18 +16,18 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-  app.UseWebAssemblyDebugging();
+    app.UseWebAssemblyDebugging();
 
-  using var scope = app.Services.CreateScope();
-  var context = scope.ServiceProvider.GetRequiredService<BlazorNotelyContext>();
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<BlazorNotelyContext>();
 
-  await context.Database.MigrateAsync();
-  await DbSeeder.SeedAsync(context);
+    await context.Database.MigrateAsync();
+    await DbSeeder.SeedAsync(context);
 }
 else
 {
-  app.UseExceptionHandler("/Error");
-  app.UseHsts();
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();

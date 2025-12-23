@@ -6,8 +6,8 @@ namespace Notely.Infrastructure.Persistence.Configurations;
 
 public class NoteTagConfiguration : IEntityTypeConfiguration<NoteTag>
 {
-  public void Configure(EntityTypeBuilder<NoteTag> builder)
-  {
-    builder.HasKey(nt => new { nt.NoteId, nt.TagId });
-  }
+    public void Configure(EntityTypeBuilder<NoteTag> builder)
+    {
+        builder.HasKey(nt => new { nt.NoteId, nt.TagId });
+    }
 }
