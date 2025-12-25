@@ -1,4 +1,4 @@
-namespace Notely.Core.Application.Features.Notes.Commands.CreateNote;
+namespace Notely.Core.Application.Responses.Notes;
 
 public class CreateNoteResponse
 {

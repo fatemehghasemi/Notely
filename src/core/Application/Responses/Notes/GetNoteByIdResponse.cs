@@ -1,11 +1,6 @@
-namespace Notely.Core.Application.Features.Notes.Queries.GetAllNotes;
+namespace Notely.Core.Application.Responses.Notes;
 
-public class GetAllNotesResponse
-{
-    public List<NoteItem> Notes { get; set; } = new();
-}
-
-public class NoteItem
+public class GetNoteByIdResponse
 {
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;

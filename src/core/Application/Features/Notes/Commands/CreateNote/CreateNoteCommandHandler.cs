@@ -1,5 +1,6 @@
 using MediatR;
 using Notely.Core.Application.Interfaces.Repositories;
+using Notely.Core.Application.Responses.Notes;
 using Notely.Core.Domain.Entities;
 
 namespace Notely.Core.Application.Features.Notes.Commands.CreateNote;

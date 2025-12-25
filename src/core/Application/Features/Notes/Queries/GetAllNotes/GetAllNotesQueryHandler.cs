@@ -1,5 +1,6 @@
 using MediatR;
 using Notely.Core.Application.Interfaces.Repositories;
+using Notely.Core.Application.Responses.Notes;
 
 namespace Notely.Core.Application.Features.Notes.Queries.GetAllNotes;
 
