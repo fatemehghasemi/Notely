@@ -1,0 +1,14 @@
+namespace Notely.Core.Application.Features.Notes.Queries.GetNoteById;
+
+public class GetNoteByIdResponse
+{
+    public Guid Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Content { get; set; } = string.Empty;
+    public bool IsPinned { get; set; }
+    public Guid? CategoryId { get; set; }
+    public string? CategoryName { get; set; }
+    public List<string> Tags { get; set; } = new();
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
