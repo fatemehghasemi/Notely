@@ -1,10 +1,11 @@
 using MediatR;
 using Notely.Core.Application.Interfaces.Repositories;
 using Notely.Core.Application.Responses.Notes;
+using Shared.Wrapper;
 
 namespace Notely.Core.Application.Features.Notes.Queries.GetNoteById;
 
-public class GetNoteByIdQueryHandler : IRequestHandler<GetNoteByIdQuery, GetNoteByIdResponse?>
+public class GetNoteByIdQueryHandler : IRequestHandler<GetNoteByIdQuery, Result<GetNoteByIdResponse?>>
 {
     private readonly INoteRepository _noteRepository;
 
@@ -13,24 +14,35 @@ public class GetNoteByIdQueryHandler : IRequestHandler<GetNoteByIdQuery, GetNote
         _noteRepository = noteRepository;
     }
 
-    public async Task<GetNoteByIdResponse?> Handle(GetNoteByIdQuery request, CancellationToken cancellationToken)
+    public async Task<Result<GetNoteByIdResponse?>> Handle(GetNoteByIdQuery request, CancellationToken cancellationToken)
     {
-        var note = await _noteRepository.GetByIdWithDetailsAsync(request.Id, cancellationToken);
-        
-        if (note == null)
-            return null;
-
-        return new GetNoteByIdResponse
+        try
         {
-            Id = note.Id,
-            Title = note.Title,
-            Content = note.Content,
-            IsPinned = note.IsPinned,
-            CategoryId = note.CategoryId,
-            CategoryName = note.Category?.Title,
-            Tags = new List<string>(),
-            CreatedAt = note.CreatedAt,
-            UpdatedAt = note.UpdatedAt ?? note.CreatedAt
-        };
+            var note = await _noteRepository.GetByIdWithDetailsAsync(request.Id, cancellationToken);
+            
+            if (note == null)
+            {
+                return Result<GetNoteByIdResponse?>.Success(null);
+            }
+
+            var response = new GetNoteByIdResponse
+            {
+                Id = note.Id,
+                Title = note.Title,
+                Content = note.Content,
+                IsPinned = note.IsPinned,
+                CategoryId = note.CategoryId,
+                CategoryName = note.Category?.Title,
+                Tags = note.NoteTags?.Select(nt => nt.Tag.Title).ToList() ?? new List<string>(),
+                CreatedAt = note.CreatedAt,
+                UpdatedAt = note.UpdatedAt ?? note.CreatedAt
+            };
+
+            return Result<GetNoteByIdResponse?>.Success(response);
+        }
+        catch (Exception ex)
+        {
+            return Result<GetNoteByIdResponse?>.Failure($"Failed to get note: {ex.Message}");
+        }
     }
 }

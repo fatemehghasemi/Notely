@@ -1,5 +1,6 @@
 using MediatR;
 using Notely.Core.Application.Responses.Notes;
+using Shared.Wrapper;
 
 namespace Notely.Core.Application.Features.Notes.Commands.UpdateNote;
 
@@ -10,4 +11,4 @@ public record UpdateNoteCommand(
     bool IsPinned,
     Guid? CategoryId = null,
     List<string>? Tags = null
-) : IRequest<UpdateNoteResponse>;
+) : IRequest<Result<UpdateNoteResponse>>;

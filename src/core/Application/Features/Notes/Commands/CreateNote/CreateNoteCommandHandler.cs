@@ -1,11 +1,13 @@
+using Mapster;
 using MediatR;
 using Notely.Core.Application.Interfaces.Repositories;
 using Notely.Core.Application.Responses.Notes;
 using Notely.Core.Domain.Entities;
+using Shared.Wrapper;
 
 namespace Notely.Core.Application.Features.Notes.Commands.CreateNote;
 
-public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, CreateNoteResponse>
+public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Result<CreateNoteResponse>>
 {
     private readonly INoteRepository _noteRepository;
 
@@ -14,26 +16,30 @@ public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Creat
         _noteRepository = noteRepository;
     }
 
-    public async Task<CreateNoteResponse> Handle(CreateNoteCommand request, CancellationToken cancellationToken)
+    public async Task<Result<CreateNoteResponse>> Handle(CreateNoteCommand request, CancellationToken cancellationToken)
     {
-        var note = new Note
+        try
         {
-            Id = Guid.NewGuid(),
-            Title = request.Title,
-            Content = request.Content,
-            IsPinned = request.IsPinned,
-            CategoryId = request.CategoryId,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
+            var note = new Note
+            {
+                Id = Guid.NewGuid(),
+                Title = request.Title,
+                Content = request.Content,
+                IsPinned = request.IsPinned,
+                CategoryId = request.CategoryId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
 
-        var createdNote = await _noteRepository.AddAsync(note, cancellationToken);
+            var createdNote = await _noteRepository.AddAsync(note, cancellationToken);
 
-        return new CreateNoteResponse
+            var response = createdNote.Adapt<CreateNoteResponse>();
+
+            return Result<CreateNoteResponse>.Success(response);
+        }
+        catch (Exception ex)
         {
-            Id = createdNote.Id,
-            Title = createdNote.Title,
-            CreatedAt = createdNote.CreatedAt
-        };
+            return Result<CreateNoteResponse>.Failure($"Failed to create note: {ex.Message}");
+        }
     }
 }

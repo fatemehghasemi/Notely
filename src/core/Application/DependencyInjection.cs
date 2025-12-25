@@ -1,4 +1,5 @@
 using FluentValidation;
+using Mapster;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Notely.Core.Application.Common.Behaviors;
@@ -15,6 +16,9 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+        // Mapster configuration
+        TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
 
         return services;
     }

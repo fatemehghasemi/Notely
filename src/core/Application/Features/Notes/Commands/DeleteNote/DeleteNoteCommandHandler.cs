@@ -1,9 +1,10 @@
 using MediatR;
 using Notely.Core.Application.Interfaces.Repositories;
+using Shared.Wrapper;
 
 namespace Notely.Core.Application.Features.Notes.Commands.DeleteNote;
 
-public class DeleteNoteCommandHandler : IRequestHandler<DeleteNoteCommand, bool>
+public class DeleteNoteCommandHandler : IRequestHandler<DeleteNoteCommand, Result>
 {
     private readonly INoteRepository _noteRepository;
 
@@ -12,8 +13,27 @@ public class DeleteNoteCommandHandler : IRequestHandler<DeleteNoteCommand, bool>
         _noteRepository = noteRepository;
     }
 
-    public async Task<bool> Handle(DeleteNoteCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(DeleteNoteCommand request, CancellationToken cancellationToken)
     {
-        return await _noteRepository.DeleteAsync(request.Id, cancellationToken);
+        try
+        {
+            var exists = await _noteRepository.ExistsAsync(request.Id, cancellationToken);
+            if (!exists)
+            {
+                return Result.Failure($"Note with ID {request.Id} not found.");
+            }
+
+            var deleted = await _noteRepository.DeleteAsync(request.Id, cancellationToken);
+            if (!deleted)
+            {
+                return Result.Failure("Failed to delete note.");
+            }
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure($"Failed to delete note: {ex.Message}");
+        }
     }
 }
