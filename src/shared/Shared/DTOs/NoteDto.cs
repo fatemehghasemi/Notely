@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BlazorNotely.Models;
+namespace Shared.DTOs;
 
-public class NoteModel
+public class NoteDto
 {
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;
@@ -11,7 +11,7 @@ public class NoteModel
     public DateTime? UpdatedAt { get; set; }
 }
 
-public class CreateNoteModel
+public class CreateNoteDto
 {
     [Required(ErrorMessage = "Title is required")]
     [StringLength(200, ErrorMessage = "Title cannot exceed 200 characters")]
@@ -22,27 +22,13 @@ public class CreateNoteModel
     public string Content { get; set; } = string.Empty;
 }
 
-public class ApiResponse<T>
+public class UpdateNoteDto
 {
-    public bool Success { get; set; }
-    public string Message { get; set; } = string.Empty;
-    public T? Data { get; set; }
-}
-
-public class GetAllNotesResponse
-{
-    public List<NoteItem> Notes { get; set; } = new();
-}
-
-public class NoteItem
-{
-    public Guid Id { get; set; }
+    [Required(ErrorMessage = "Title is required")]
+    [StringLength(200, ErrorMessage = "Title cannot exceed 200 characters")]
     public string Title { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Content is required")]
+    [StringLength(5000, ErrorMessage = "Content cannot exceed 5000 characters")]
     public string Content { get; set; } = string.Empty;
-    public bool IsPinned { get; set; }
-    public Guid? CategoryId { get; set; }
-    public string? CategoryName { get; set; }
-    public List<string> Tags { get; set; } = new();
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
 }

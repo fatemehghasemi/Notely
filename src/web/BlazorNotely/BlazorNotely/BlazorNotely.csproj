@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\core\Application\Application.csproj" />
     <ProjectReference Include="..\..\..\infrastructure\Infrastructure\Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\shared\Shared\Shared.csproj" />
     <ProjectReference Include="..\BlazorNotely.Client\BlazorNotely.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.1" />
   </ItemGroup>

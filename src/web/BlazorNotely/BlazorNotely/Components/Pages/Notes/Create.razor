@@ -1,7 +1,7 @@
 @page "/notes/create"
 @using System.Text.Json
 @using System.Text
-@using BlazorNotely.Models
+@using Shared.DTOs
 @inject HttpClient Http
 @inject NavigationManager Navigation
 
@@ -131,14 +131,14 @@
 
 @code {
     [SupplyParameterFromForm]
-    private CreateNoteModel newNote { get; set; } = default!;
+    private CreateNoteDto newNote { get; set; } = default!;
     private bool isLoading = false;
     private string message = string.Empty;
     private bool isError = false;
 
     protected override void OnInitialized()
     {
-        newNote ??= new CreateNoteModel();
+        newNote ??= new CreateNoteDto();
     }
 
     private async Task CreateNote()
