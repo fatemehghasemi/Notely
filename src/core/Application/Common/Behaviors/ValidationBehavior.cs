@@ -30,7 +30,6 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         {
             var errors = failures.Select(f => f.ErrorMessage).ToList();
             
-            // اگه TResponse از نوع Result باشه
             if (typeof(TResponse).IsGenericType && typeof(TResponse).GetGenericTypeDefinition() == typeof(Result<>))
             {
                 var resultType = typeof(TResponse);

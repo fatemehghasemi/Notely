@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Notely.Core.Application.Interfaces.Repositories;
 using Notely.Infrastructure.Persistence;
+using Notely.Infrastructure.Repositories;
 
 namespace Notely.Infrastructure;
 
@@ -17,6 +19,8 @@ public static class DependencyInjection
             )
         ));
 
+        // Register Repositories
+        services.AddScoped<INoteRepository, NoteRepository>();
 
         return services;
     }

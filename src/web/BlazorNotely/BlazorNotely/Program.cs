@@ -3,6 +3,7 @@ using Infrastructure.Seed;
 using Microsoft.EntityFrameworkCore;
 using Notely.Infrastructure;
 using Notely.Infrastructure.Persistence;
+using Notely.Core.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,11 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
+builder.Services.AddControllers();
+builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddLocalization();
+builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
@@ -32,6 +38,9 @@ else
 
 app.UseHttpsRedirection();
 app.UseAntiforgery();
+
+// Map API Controllers
+app.MapControllers();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
