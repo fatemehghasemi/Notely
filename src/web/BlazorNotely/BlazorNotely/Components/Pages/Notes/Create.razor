@@ -1,0 +1,205 @@
+@page "/notes/create"
+@using System.Text.Json
+@using System.Text
+@using BlazorNotely.Models
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>Create New Note</PageTitle>
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-plus-circle me-2"></i>
+                            Create New Note
+                        </h4>
+                        <button class="btn btn-light btn-sm" @onclick="NavigateBack">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Back to Notes
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <EditForm Model="@newNote" OnValidSubmit="@CreateNote" FormName="CreateNoteForm">
+                        <DataAnnotationsValidator />
+                        
+                        <div class="mb-4">
+                            <label for="title" class="form-label fw-bold">
+                                <i class="fas fa-heading me-2 text-primary"></i>
+                                Title
+                            </label>
+                            <InputText id="title" 
+                                      class="form-control form-control-lg" 
+                                      @bind-Value="newNote.Title" 
+                                      placeholder="Enter note title..." />
+                            <ValidationMessage For="@(() => newNote.Title)" class="text-danger small mt-1" />
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="content" class="form-label fw-bold">
+                                <i class="fas fa-align-left me-2 text-primary"></i>
+                                Content
+                            </label>
+                            <InputTextArea id="content" 
+                                          class="form-control" 
+                                          rows="12" 
+                                          @bind-Value="newNote.Content" 
+                                          placeholder="Write your note content here..." />
+                            <ValidationMessage For="@(() => newNote.Content)" class="text-danger small mt-1" />
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                You can use markdown formatting in your note content.
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-muted small">
+                                <i class="fas fa-save me-1"></i>
+                                Your note will be saved automatically
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-outline-secondary me-2" @onclick="NavigateBack">
+                                    <i class="fas fa-times me-1"></i>
+                                    Cancel
+                                </button>
+                                <button type="submit" class="btn btn-success" disabled="@isLoading">
+                                    @if (isLoading)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        <span>Creating...</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-save me-1"></i>
+                                        <span>Create Note</span>
+                                    }
+                                </button>
+                            </div>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div class="toast show" role="alert">
+            <div class="toast-header @(isError ? "bg-danger" : "bg-success") text-white">
+                <i class="fas @(isError ? "fa-exclamation-circle" : "fa-check-circle") me-2"></i>
+                <strong class="me-auto">@(isError ? "Error" : "Success")</strong>
+                <button type="button" class="btn-close btn-close-white" @onclick="ClearMessage"></button>
+            </div>
+            <div class="toast-body">
+                @message
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .form-control:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+    
+    .form-control-lg {
+        font-size: 1.25rem;
+        font-weight: 500;
+    }
+    
+    textarea.form-control {
+        resize: vertical;
+        min-height: 200px;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 12px;
+    }
+    
+    .card-header {
+        border-radius: 12px 12px 0 0 !important;
+    }
+</style>
+
+@code {
+    [SupplyParameterFromForm]
+    private CreateNoteModel newNote { get; set; } = default!;
+    private bool isLoading = false;
+    private string message = string.Empty;
+    private bool isError = false;
+
+    protected override void OnInitialized()
+    {
+        newNote ??= new CreateNoteModel();
+    }
+
+    private async Task CreateNote()
+    {
+        isLoading = true;
+        message = string.Empty;
+        
+        try
+        {
+            var json = JsonSerializer.Serialize(newNote);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            
+            var baseUri = Navigation.BaseUri;
+            var response = await Http.PostAsync($"{baseUri}api/notes", content);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                ShowMessage("Note created successfully!", false);
+                
+                // Navigate back to notes list after 2 seconds
+                await Task.Delay(2000);
+                Navigation.NavigateTo("/notes");
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                ShowMessage($"Error creating note: {response.StatusCode}", true);
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowMessage($"Error: {ex.Message}", true);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void NavigateBack()
+    {
+        Navigation.NavigateTo("/notes");
+    }
+
+    private void ShowMessage(string msg, bool error = false)
+    {
+        message = msg;
+        isError = error;
+        StateHasChanged();
+        
+        if (!error)
+        {
+            // Auto-hide success message after 3 seconds
+            _ = Task.Delay(3000).ContinueWith(_ => ClearMessage());
+        }
+    }
+
+    private void ClearMessage()
+    {
+        message = string.Empty;
+        StateHasChanged();
+    }
+
+}
