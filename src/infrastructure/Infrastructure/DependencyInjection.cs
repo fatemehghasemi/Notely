@@ -21,6 +21,7 @@ public static class DependencyInjection
 
         // Register Repositories
         services.AddScoped<INoteRepository, NoteRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
 
         return services;
     }

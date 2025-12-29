@@ -26,9 +26,9 @@ public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Resul
                 Title = request.Title,
                 Content = request.Content,
                 IsPinned = request.IsPinned,
-                CategoryId = request.CategoryId,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                CategoryId = request.CategoryId
+                // CreatedAt خودکار در SaveChangesAsync تنظیم می‌شود
+                // UpdatedAt = null (default) چون هنوز update نشده
             };
 
             var createdNote = await _noteRepository.AddAsync(note, cancellationToken);

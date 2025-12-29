@@ -28,7 +28,7 @@ public class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand, Resul
             note.Content = request.Content;
             note.IsPinned = request.IsPinned;
             note.CategoryId = request.CategoryId;
-            note.UpdatedAt = DateTime.UtcNow;
+            // UpdatedAt خودکار در SaveChangesAsync تنظیم می‌شود
 
             var updatedNote = await _noteRepository.UpdateAsync(note, cancellationToken);
 

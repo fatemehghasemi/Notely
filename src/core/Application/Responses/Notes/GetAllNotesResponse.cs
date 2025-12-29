@@ -15,5 +15,5 @@ public class NoteItem
     public string? CategoryName { get; set; }
     public List<string> Tags { get; set; } = new();
     public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 }
