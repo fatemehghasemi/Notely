@@ -1,4 +1,5 @@
-using BlazorNotely.Components;
+using Notely.Web;
+using Notely.Web.Components;
 using Infrastructure.Seed;
 using Microsoft.EntityFrameworkCore;
 using Notely.Infrastructure;
@@ -7,23 +8,24 @@ using Notely.Core.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add Blazor Server components only
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents()
-    .AddInteractiveWebAssemblyComponents();
+    .AddInteractiveServerComponents();
 
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddLocalization();
+
+// Add layer dependencies
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddWebServices(); // Add Web layer services
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseWebAssemblyDebugging();
-
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<BlazorNotelyContext>();
 
@@ -44,7 +46,6 @@ app.MapControllers();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode()
-    .AddInteractiveWebAssemblyRenderMode();
+    .AddInteractiveServerRenderMode();
 
 app.Run();
