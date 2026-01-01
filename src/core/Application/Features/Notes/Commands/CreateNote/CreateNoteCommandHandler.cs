@@ -10,10 +10,12 @@ namespace Notely.Core.Application.Features.Notes.Commands.CreateNote;
 public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Result<CreateNoteResponse>>
 {
     private readonly INoteRepository _noteRepository;
+    private readonly ITagRepository _tagRepository;
 
-    public CreateNoteCommandHandler(INoteRepository noteRepository)
+    public CreateNoteCommandHandler(INoteRepository noteRepository, ITagRepository tagRepository)
     {
         _noteRepository = noteRepository;
+        _tagRepository = tagRepository;
     }
 
     public async Task<Result<CreateNoteResponse>> Handle(CreateNoteCommand request, CancellationToken cancellationToken)
@@ -27,9 +29,35 @@ public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Resul
                 Content = request.Content,
                 IsPinned = request.IsPinned,
                 CategoryId = request.CategoryId
-                // CreatedAt خودکار در SaveChangesAsync تنظیم می‌شود
-                // UpdatedAt = null (default) چون هنوز update نشده
             };
+
+            if (request.Tags?.Any() == true)
+            {
+                var noteTags = new List<NoteTag>();
+                
+                foreach (var tagTitle in request.Tags)
+                {
+                    var existingTag = await _tagRepository.GetByTitleAsync(tagTitle, cancellationToken);
+                    
+                    if (existingTag == null)
+                    {
+                        existingTag = new Tag
+                        {
+                            Id = Guid.NewGuid(),
+                            Title = tagTitle
+                        };
+                        existingTag = await _tagRepository.AddAsync(existingTag, cancellationToken);
+                    }
+
+                    noteTags.Add(new NoteTag
+                    {
+                        NoteId = note.Id,
+                        TagId = existingTag.Id
+                    });
+                }
+
+                note.NoteTags = noteTags;
+            }
 
             var createdNote = await _noteRepository.AddAsync(note, cancellationToken);
 

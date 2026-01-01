@@ -1,5 +1,9 @@
 @page "/notes/create"
-@using Notely.Web.Services
+@using Shared.DTOs
+@using Notely.Web.Services.AppServices
+@using Microsoft.AspNetCore.Components.Forms
+@inject INotesAppService NotesService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Create Note - Notely</PageTitle>
 
@@ -9,19 +13,19 @@
             <i class="fas fa-plus-circle"></i>
             Create New Note
         </h1>
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle"></i>
-            Note editing will be enabled in Phase 2.
-        </div>
     </div>
 
-    <form>
+    <EditForm Model="noteModel" OnValidSubmit="HandleValidSubmit" FormName="CreateNoteForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
         <div class="form-group">
             <label class="form-label" for="title">
                 <i class="fas fa-heading"></i>
                 Title
             </label>
-            <input id="title" class="form-control" type="text" @bind="noteModel.Title" placeholder="Enter note title..." />
+            <InputText id="title" class="form-control" @bind-Value="noteModel.Title" placeholder="Enter note title..." />
+            <ValidationMessage For="@(() => noteModel.Title)" />
         </div>
 
         <div class="form-group">
@@ -29,7 +33,29 @@
                 <i class="fas fa-align-left"></i>
                 Content
             </label>
-            <textarea id="content" class="form-control content-textarea" @bind="noteModel.Content" placeholder="Write your note content here..."></textarea>
+            <InputTextArea id="content" class="form-control content-textarea" @bind-Value="noteModel.Content" placeholder="Write your note content here..." />
+            <ValidationMessage For="@(() => noteModel.Content)" />
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <div class="form-check">
+                    <InputCheckbox id="isPinned" class="form-check-input" @bind-Value="noteModel.IsPinned" />
+                    <label class="form-check-label" for="isPinned">
+                        <i class="fas fa-thumbtack"></i>
+                        Pin this note
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="tags">
+                <i class="fas fa-tags"></i>
+                Tags (comma-separated)
+            </label>
+            <InputText id="tags" class="form-control" @bind-Value="tagsInput" placeholder="Enter tags separated by commas..." />
+            <small class="form-text text-muted">Example: work, important, project</small>
         </div>
 
         <div class="editor-actions">
@@ -37,22 +63,60 @@
                 <i class="fas fa-times"></i>
                 Cancel
             </a>
-            <button type="button" class="btn-save" disabled>
-                <i class="fas fa-save"></i>
-                <span>Save Note (Coming in Phase 2)</span>
+            <button type="submit" class="btn-save" disabled="@isSubmitting">
+                @if (isSubmitting)
+                {
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>Saving...</span>
+                }
+                else
+                {
+                    <i class="fas fa-save"></i>
+                    <span>Save Note</span>
+                }
             </button>
         </div>
-    </form>
+    </EditForm>
 </div>
 
 @code {
-    private CreateNoteModel noteModel = new();
+    [SupplyParameterFromForm]
+    private CreateNoteDto noteModel { get; set; } = null!;
+    
+    private bool isSubmitting = false;
+    private string tagsInput = string.Empty;
 
-    public class CreateNoteModel
+    protected override void OnInitialized()
     {
-        public string Title { get; set; } = string.Empty;
-        public string Content { get; set; } = string.Empty;
+        noteModel ??= new();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        isSubmitting = true;
+        StateHasChanged();
+
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(tagsInput))
+            {
+                noteModel.Tags = tagsInput
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(tag => tag.Trim())
+                    .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                    .ToList();
+            }
+
+            await NotesService.CreateNoteAsync(noteModel);
+            NavigationManager.NavigateTo("/notes");
+        }
+        catch
+        {
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+        }
     }
 }
-
-@inject NavigationManager NavigationManager

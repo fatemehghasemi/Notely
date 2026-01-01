@@ -1,5 +1,9 @@
 @page "/notes/edit/{id:guid}"
-@using Notely.Web.Services
+@using Shared.DTOs
+@using Notely.Web.Services.AppServices
+@using Microsoft.AspNetCore.Components.Forms
+@inject INotesAppService NotesService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Edit Note - Notely</PageTitle>
 
@@ -9,63 +13,177 @@
             <i class="fas fa-edit"></i>
             Edit Note
         </h1>
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle"></i>
-            Note editing will be enabled in Phase 2.
-        </div>
     </div>
 
-    <form>
-        <div class="form-group">
-            <label class="form-label" for="title">
-                <i class="fas fa-heading"></i>
-                Title
-            </label>
-            <input id="title" class="form-control" type="text" @bind="noteModel.Title" placeholder="Enter note title..." />
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <div class="loading-spinner"></div>
+            <p class="mt-2">Loading note...</p>
         </div>
+    }
+    else if (noteNotFound)
+    {
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            Note not found. It may have been deleted.
+            <a href="/notes" class="btn btn-link">Return to Notes</a>
+        </div>
+    }
+    else
+    {
+        <EditForm Model="noteModel" OnValidSubmit="HandleValidSubmit" FormName="EditNoteForm">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-        <div class="form-group">
-            <label class="form-label" for="content">
-                <i class="fas fa-align-left"></i>
-                Content
-            </label>
-            <textarea id="content" class="form-control content-textarea" @bind="noteModel.Content" placeholder="Write your note content here..."></textarea>
-        </div>
+            <div class="form-group">
+                <label class="form-label" for="title">
+                    <i class="fas fa-heading"></i>
+                    Title
+                </label>
+                <InputText id="title" class="form-control" @bind-Value="noteModel.Title" placeholder="Enter note title..." />
+                <ValidationMessage For="@(() => noteModel.Title)" />
+            </div>
 
-        <div class="editor-actions">
-            <a href="/notes" class="btn-cancel">
-                <i class="fas fa-times"></i>
-                Cancel
-            </a>
-            <button type="button" class="btn-save" disabled>
-                <i class="fas fa-save"></i>
-                <span>Update Note (Coming in Phase 2)</span>
-            </button>
-        </div>
-    </form>
+            <div class="form-group">
+                <label class="form-label" for="content">
+                    <i class="fas fa-align-left"></i>
+                    Content
+                </label>
+                <InputTextArea id="content" class="form-control content-textarea" @bind-Value="noteModel.Content" placeholder="Write your note content here..." />
+                <ValidationMessage For="@(() => noteModel.Content)" />
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <div class="form-check">
+                        <InputCheckbox id="isPinned" class="form-check-input" @bind-Value="noteModel.IsPinned" />
+                        <label class="form-check-label" for="isPinned">
+                            <i class="fas fa-thumbtack"></i>
+                            Pin this note
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="tags">
+                    <i class="fas fa-tags"></i>
+                    Tags (comma-separated)
+                </label>
+                <InputText id="tags" class="form-control" @bind-Value="tagsInput" placeholder="Enter tags separated by commas..." />
+                <small class="form-text text-muted">Example: work, important, project</small>
+            </div>
+
+            <div class="editor-actions">
+                <a href="/notes" class="btn-cancel">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </a>
+                <button type="submit" class="btn-save" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Updating...</span>
+                    }
+                    else
+                    {
+                        <i class="fas fa-save"></i>
+                        <span>Update Note</span>
+                    }
+                </button>
+            </div>
+        </EditForm>
+    }
 </div>
 
 @code {
     [Parameter] public Guid Id { get; set; }
     
-    private EditNoteModel noteModel = new();
+    [SupplyParameterFromForm]
+    private UpdateNoteDto noteModel { get; set; } = null!;
+    
+    private bool isLoading = true;
+    private bool isSubmitting = false;
+    private bool noteNotFound = false;
+    private string tagsInput = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        noteModel = new EditNoteModel
-        {
-            Id = Id,
-            Title = "Sample Note Title",
-            Content = "This is sample content for the note. Editing functionality will be available in Phase 2."
-        };
+        noteModel ??= new();
+        await LoadNote();
     }
 
-    public class EditNoteModel
+    private async Task LoadNote()
     {
-        public Guid Id { get; set; }
-        public string Title { get; set; } = string.Empty;
-        public string Content { get; set; } = string.Empty;
+        isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            var note = await NotesService.GetNoteByIdAsync(Id);
+            if (note != null)
+            {
+                noteModel = new UpdateNoteDto
+                {
+                    Title = note.Title,
+                    Content = note.Content,
+                    IsPinned = note.IsPinned,
+                    CategoryId = note.CategoryId,
+                    Tags = note.Tags
+                };
+
+                if (note.Tags?.Any() == true)
+                {
+                    tagsInput = string.Join(", ", note.Tags);
+                }
+            }
+            else
+            {
+                noteNotFound = true;
+            }
+        }
+        catch
+        {
+            noteNotFound = true;
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        isSubmitting = true;
+        StateHasChanged();
+
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(tagsInput))
+            {
+                noteModel.Tags = tagsInput
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(tag => tag.Trim())
+                    .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                    .ToList();
+            }
+            else
+            {
+                noteModel.Tags = new List<string>();
+            }
+
+            await NotesService.UpdateNoteAsync(Id, noteModel);
+            NavigationManager.NavigateTo("/notes");
+        }
+        catch
+        {
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+        }
     }
 }
-
-@inject NavigationManager NavigationManager

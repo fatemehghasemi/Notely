@@ -19,9 +19,9 @@ public static class DependencyInjection
             )
         ));
 
-        // Register Repositories
         services.AddScoped<INoteRepository, NoteRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ITagRepository, TagRepository>();
 
         return services;
     }

@@ -1,4 +1,8 @@
 @page "/notes"
+@using Shared.DTOs
+@using Notely.Web.Services.AppServices
+@inject INotesAppService NotesService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Notes - Notely</PageTitle>
 
@@ -14,11 +18,6 @@
         </a>
     </div>
 
-    <div class="alert alert-info">
-        <i class="fas fa-info-circle"></i>
-        Note management will be fully enabled in Phase 2. Currently showing sample data.
-    </div>
-
     @if (isLoading)
     {
         <div class="text-center">
@@ -32,18 +31,66 @@
             @foreach (var note in notes)
             {
                 <div class="note-card">
-                    <h3 class="note-title">@note.Title</h3>
+                    <div class="note-header">
+                        <h3 class="note-title">
+                            @if (note.IsPinned)
+                            {
+                                <i class="fas fa-thumbtack text-warning"></i>
+                            }
+                            @note.Title
+                        </h3>
+                        @if (!string.IsNullOrEmpty(note.CategoryName))
+                        {
+                            <span class="note-category">
+                                <i class="fas fa-folder"></i>
+                                @note.CategoryName
+                            </span>
+                        }
+                    </div>
                     <div class="note-content">
                         @note.Content
                     </div>
+                    @if (note.Tags?.Any() == true)
+                    {
+                        <div class="note-tags">
+                            @foreach (var tag in note.Tags.Take(3))
+                            {
+                                <span class="note-tag">
+                                    <i class="fas fa-tag"></i>
+                                    @tag
+                                </span>
+                            }
+                            @if (note.Tags.Count > 3)
+                            {
+                                <span class="note-tag-more">+@(note.Tags.Count - 3) more</span>
+                            }
+                        </div>
+                    }
+                    <div class="note-meta">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar"></i>
+                            @note.CreatedAt.ToString("MMM dd, yyyy")
+                            @if (note.UpdatedAt.HasValue)
+                            {
+                                <span class="updated-indicator">
+                                    <i class="fas fa-edit"></i>
+                                    Updated @note.UpdatedAt.Value.ToString("MMM dd")
+                                </span>
+                            }
+                        </small>
+                    </div>
                     <div class="note-actions">
+                        <a href="/notes/details/@note.Id" class="btn-note-action btn-details">
+                            <i class="fas fa-eye"></i>
+                            Details
+                        </a>
                         <a href="/notes/edit/@note.Id" class="btn-note-action btn-edit">
                             <i class="fas fa-edit"></i>
                             Edit
                         </a>
-                        <button class="btn-note-action btn-delete" disabled>
+                        <button class="btn-note-action btn-delete" @onclick="() => DeleteNote(note.Id)">
                             <i class="fas fa-trash"></i>
-                            Delete (Phase 2)
+                            Delete
                         </button>
                     </div>
                 </div>
@@ -58,11 +105,11 @@
             </div>
             <h2 class="empty-notes-title">No Notes Yet</h2>
             <p class="empty-notes-text">
-                Note creation will be enabled in Phase 2.
+                Create your first note to get started!
             </p>
             <a href="/notes/create" class="btn-create-note">
                 <i class="fas fa-plus"></i>
-                Preview Create Note
+                Create Your First Note
             </a>
         </div>
     }
@@ -70,47 +117,50 @@
 
 @code {
     private bool isLoading = true;
-    private List<NoteDto>? notes;
+    private IEnumerable<NoteDto>? notes;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadSampleNotes();
+        await LoadNotes();
     }
 
-    private async Task LoadSampleNotes()
+    private async Task LoadNotes()
     {
         isLoading = true;
         StateHasChanged();
         
-        await Task.Delay(500);
-        
-        notes = new List<NoteDto>
+        try
         {
-            new NoteDto 
-            { 
-                Id = Guid.NewGuid(), 
-                Title = "Welcome to Notely", 
-                Content = "This is sample data. Real note management will be available in Phase 2.",
-                CreatedAt = DateTime.Now.AddDays(-2)
-            },
-            new NoteDto 
-            { 
-                Id = Guid.NewGuid(), 
-                Title = "Phase 1 Complete", 
-                Content = "UI structure is ready. Business logic and data persistence will be implemented in Phase 2.",
-                CreatedAt = DateTime.Now.AddHours(-3)
-            }
-        };
-        
-        isLoading = false;
-        StateHasChanged();
+            notes = await NotesService.GetAllNotesAsync();
+        }
+        catch
+        {
+            notes = new List<NoteDto>();
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
     }
 
-    public class NoteDto
+    private async Task DeleteNote(Guid id)
     {
-        public Guid Id { get; set; }
-        public string Title { get; set; } = string.Empty;
-        public string Content { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
+        if (await ConfirmDelete())
+        {
+            try
+            {
+                await NotesService.DeleteNoteAsync(id);
+                await LoadNotes();
+            }
+            catch
+            {
+            }
+        }
+    }
+
+    private async Task<bool> ConfirmDelete()
+    {
+        return await Task.FromResult(true);
     }
 }

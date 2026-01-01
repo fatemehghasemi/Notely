@@ -1,6 +1,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Notely.Core.Application.Features.Notes.Commands.CreateNote;
+using Notely.Core.Application.Features.Notes.Commands.UpdateNote;
+using Notely.Core.Application.Features.Notes.Commands.DeleteNote;
 using Notely.Core.Application.Features.Notes.Queries.GetAllNotes;
 using Notely.Core.Application.Features.Notes.Queries.GetNoteById;
 
@@ -41,6 +43,37 @@ public class NotesController : ControllerBase
     public async Task<IActionResult> CreateNote([FromBody] CreateNoteCommand command)
     {
         var result = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetNoteById), new { id = result.Data?.Id }, result);
+        if (result.IsSuccess && result.Data != null)
+        {
+            return CreatedAtAction(nameof(GetNoteById), new { id = result.Data.Id }, result);
+        }
+        return BadRequest(result);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateNote(Guid id, [FromBody] UpdateNoteCommand command)
+    {
+        if (id != command.Id)
+        {
+            return BadRequest("ID mismatch");
+        }
+
+        var result = await _mediator.Send(command);
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        }
+        return BadRequest(result);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteNote(Guid id)
+    {
+        var result = await _mediator.Send(new DeleteNoteCommand(id));
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+        return BadRequest(result);
     }
 }

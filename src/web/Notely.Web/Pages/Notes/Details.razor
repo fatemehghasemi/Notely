@@ -1,0 +1,158 @@
+@page "/notes/details/{id:guid}"
+@using Shared.DTOs
+@using Notely.Web.Services.AppServices
+@inject INotesAppService NotesService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Note Details - Notely</PageTitle>
+
+<div class="note-details">
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <div class="loading-spinner"></div>
+            <p class="mt-2">Loading note...</p>
+        </div>
+    }
+    else if (noteNotFound)
+    {
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            Note not found. It may have been deleted.
+            <a href="/notes" class="btn btn-link">Return to Notes</a>
+        </div>
+    }
+    else if (note != null)
+    {
+        <div class="note-details-header">
+            <div class="note-title-section">
+                <h1 class="note-details-title">
+                    @if (note.IsPinned)
+                    {
+                        <i class="fas fa-thumbtack text-warning"></i>
+                    }
+                    @note.Title
+                </h1>
+                @if (!string.IsNullOrEmpty(note.CategoryName))
+                {
+                    <span class="note-category">
+                        <i class="fas fa-folder"></i>
+                        @note.CategoryName
+                    </span>
+                }
+            </div>
+            <div class="note-actions">
+                <a href="/notes/edit/@note.Id" class="btn-note-action btn-edit">
+                    <i class="fas fa-edit"></i>
+                    Edit
+                </a>
+                <button class="btn-note-action btn-delete" @onclick="() => DeleteNote(note.Id)">
+                    <i class="fas fa-trash"></i>
+                    Delete
+                </button>
+                <a href="/notes" class="btn-note-action btn-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Notes
+                </a>
+            </div>
+        </div>
+
+        <div class="note-content-section">
+            <div class="note-content">
+                @((MarkupString)note.Content.Replace("\n", "<br>"))
+            </div>
+        </div>
+
+        @if (note.Tags?.Any() == true)
+        {
+            <div class="note-tags-section">
+                <h3 class="tags-title">
+                    <i class="fas fa-tags"></i>
+                    Tags
+                </h3>
+                <div class="note-tags">
+                    @foreach (var tag in note.Tags)
+                    {
+                        <span class="note-tag">
+                            <i class="fas fa-tag"></i>
+                            @tag
+                        </span>
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="note-meta-section">
+            <div class="note-meta">
+                <div class="meta-item">
+                    <i class="fas fa-calendar-plus"></i>
+                    <strong>Created:</strong> @note.CreatedAt.ToString("MMM dd, yyyy 'at' h:mm tt")
+                </div>
+                @if (note.UpdatedAt.HasValue)
+                {
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-edit"></i>
+                        <strong>Updated:</strong> @note.UpdatedAt.Value.ToString("MMM dd, yyyy 'at' h:mm tt")
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    
+    private NoteDto? note;
+    private bool isLoading = true;
+    private bool noteNotFound = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadNote();
+    }
+
+    private async Task LoadNote()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            note = await NotesService.GetNoteByIdAsync(Id);
+            if (note == null)
+            {
+                noteNotFound = true;
+            }
+        }
+        catch
+        {
+            noteNotFound = true;
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task DeleteNote(Guid id)
+    {
+        if (await ConfirmDelete())
+        {
+            try
+            {
+                await NotesService.DeleteNoteAsync(id);
+                NavigationManager.NavigateTo("/notes");
+            }
+            catch
+            {
+            }
+        }
+    }
+
+    private async Task<bool> ConfirmDelete()
+    {
+        return await Task.FromResult(true);
+    }
+}
