@@ -1,16 +1,12 @@
+using Shared.DTOs;
+
 namespace Notely.Web.Services.AppServices;
 
-/// <summary>
-/// Application service interface for Notes functionality.
-/// Acts as facade between UI and Application layer.
-/// </summary>
 public interface INotesAppService
 {
-    // TODO: Add method signatures in next phase
-    // Example methods that will be implemented:
-    // Task<IEnumerable<NoteDto>> GetAllNotesAsync();
-    // Task<NoteDto> GetNoteByIdAsync(int id);
-    // Task<int> CreateNoteAsync(CreateNoteDto dto);
-    // Task UpdateNoteAsync(int id, UpdateNoteDto dto);
-    // Task DeleteNoteAsync(int id);
+    Task<IEnumerable<NoteDto>> GetAllNotesAsync(CancellationToken cancellationToken = default);
+    Task<NoteDto?> GetNoteByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Guid> CreateNoteAsync(CreateNoteDto dto, CancellationToken cancellationToken = default);
+    Task UpdateNoteAsync(Guid id, UpdateNoteDto dto, CancellationToken cancellationToken = default);
+    Task DeleteNoteAsync(Guid id, CancellationToken cancellationToken = default);
 }

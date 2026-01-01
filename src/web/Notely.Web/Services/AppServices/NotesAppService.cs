@@ -1,19 +1,35 @@
+using Shared.DTOs;
+
 namespace Notely.Web.Services.AppServices;
 
-/// <summary>
-/// Application service implementation for Notes functionality.
-/// This is where MediatR will be used to communicate with Application layer.
-/// </summary>
 public class NotesAppService : INotesAppService
 {
-    // TODO: Inject MediatR in next phase
-    // private readonly IMediator _mediator;
-    
     public NotesAppService()
     {
-        // TODO: Constructor injection in next phase
     }
-    
-    // TODO: Implement methods in next phase
-    // All methods will throw NotImplementedException for now
+
+    public Task<IEnumerable<NoteDto>> GetAllNotesAsync(CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<NoteDto?> GetNoteByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Guid> CreateNoteAsync(CreateNoteDto dto, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task UpdateNoteAsync(Guid id, UpdateNoteDto dto, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task DeleteNoteAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
 }
