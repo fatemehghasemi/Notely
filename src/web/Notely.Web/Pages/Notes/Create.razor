@@ -1,13 +1,58 @@
 @page "/notes/create"
-@* Create Note Page *@
+@using Notely.Web.Services
 
-<PageTitle>Create Note</PageTitle>
+<PageTitle>Create Note - Notely</PageTitle>
 
-<h1>Create Note</h1>
+<div class="note-editor">
+    <div class="editor-header">
+        <h1 class="editor-title">
+            <i class="fas fa-plus-circle"></i>
+            Create New Note
+        </h1>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            Note editing will be enabled in Phase 2.
+        </div>
+    </div>
 
-@* TODO: Use NoteEditor component in next phase *@
-<p>Create note page will be implemented in next phase.</p>
+    <form>
+        <div class="form-group">
+            <label class="form-label" for="title">
+                <i class="fas fa-heading"></i>
+                Title
+            </label>
+            <input id="title" class="form-control" type="text" @bind="noteModel.Title" placeholder="Enter note title..." />
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="content">
+                <i class="fas fa-align-left"></i>
+                Content
+            </label>
+            <textarea id="content" class="form-control content-textarea" @bind="noteModel.Content" placeholder="Write your note content here..."></textarea>
+        </div>
+
+        <div class="editor-actions">
+            <a href="/notes" class="btn-cancel">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+            <button type="button" class="btn-save" disabled>
+                <i class="fas fa-save"></i>
+                <span>Save Note (Coming in Phase 2)</span>
+            </button>
+        </div>
+    </form>
+</div>
 
 @code {
-    // TODO: Add page logic in next phase
+    private CreateNoteModel noteModel = new();
+
+    public class CreateNoteModel
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+    }
 }
+
+@inject NavigationManager NavigationManager

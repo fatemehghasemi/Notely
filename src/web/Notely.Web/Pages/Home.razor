@@ -1,17 +1,81 @@
 @page "/"
-@* Home Page *@
 
-<PageTitle>Notely - Home</PageTitle>
+<PageTitle>Notely - Your Personal Note-Taking App</PageTitle>
 
-<h1>Welcome to Notely</h1>
+<div class="notes-container">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary mb-3">
+            <i class="fas fa-sticky-note me-3"></i>
+            Welcome to Notely
+        </h1>
+        <p class="lead text-muted mb-4">
+            Your personal space for capturing thoughts, ideas, and important information.
+            Simple, elegant, and always accessible.
+        </p>
+    </div>
 
-<p>Your personal note-taking application.</p>
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="text-center p-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-pencil-alt fa-3x text-primary"></i>
+                </div>
+                <h4 class="fw-semibold">Easy Writing</h4>
+                <p class="text-muted">
+                    Clean and distraction-free interface that lets you focus on your thoughts.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="text-center p-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-search fa-3x text-primary"></i>
+                </div>
+                <h4 class="fw-semibold">Quick Access</h4>
+                <p class="text-muted">
+                    Find your notes instantly with our intuitive organization system.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="text-center p-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-cloud fa-3x text-primary"></i>
+                </div>
+                <h4 class="fw-semibold">Always Available</h4>
+                <p class="text-muted">
+                    Your notes are safely stored and accessible whenever you need them.
+                </p>
+            </div>
+        </div>
+    </div>
 
-<div class="quick-actions">
-    <a href="/notes" class="btn btn-primary">View Notes</a>
-    <a href="/notes/create" class="btn btn-secondary">Create Note</a>
+    <div class="text-center">
+        <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+            <a href="/notes" class="btn btn-primary btn-lg px-4">
+                <i class="fas fa-eye me-2"></i>
+                View My Notes
+            </a>
+            <a href="/notes/create" class="btn-create-note btn-lg px-4">
+                <i class="fas fa-plus me-2"></i>
+                Create New Note
+            </a>
+        </div>
+    </div>
 </div>
 
-@code {
-    // TODO: Add home page logic in next phase
-}
+<style>
+    .feature-icon {
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .display-4 {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+</style>

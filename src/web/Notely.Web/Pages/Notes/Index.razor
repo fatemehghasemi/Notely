@@ -1,13 +1,116 @@
 @page "/notes"
-@* Notes Index Page *@
 
-<PageTitle>Notes</PageTitle>
+<PageTitle>Notes - Notely</PageTitle>
 
-<h1>Notes</h1>
+<div class="notes-container">
+    <div class="notes-header">
+        <h1 class="notes-title">
+            <i class="fas fa-sticky-note"></i>
+            My Notes
+        </h1>
+        <a href="/notes/create" class="btn-create-note">
+            <i class="fas fa-plus"></i>
+            Create New Note
+        </a>
+    </div>
 
-@* TODO: Use NoteList component in next phase *@
-<p>Notes page will be implemented in next phase.</p>
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        Note management will be fully enabled in Phase 2. Currently showing sample data.
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <div class="loading-spinner"></div>
+            <p class="mt-2">Loading notes...</p>
+        </div>
+    }
+    else if (notes?.Any() == true)
+    {
+        <div class="notes-grid">
+            @foreach (var note in notes)
+            {
+                <div class="note-card">
+                    <h3 class="note-title">@note.Title</h3>
+                    <div class="note-content">
+                        @note.Content
+                    </div>
+                    <div class="note-actions">
+                        <a href="/notes/edit/@note.Id" class="btn-note-action btn-edit">
+                            <i class="fas fa-edit"></i>
+                            Edit
+                        </a>
+                        <button class="btn-note-action btn-delete" disabled>
+                            <i class="fas fa-trash"></i>
+                            Delete (Phase 2)
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-notes">
+            <div class="empty-notes-icon">
+                <i class="fas fa-sticky-note"></i>
+            </div>
+            <h2 class="empty-notes-title">No Notes Yet</h2>
+            <p class="empty-notes-text">
+                Note creation will be enabled in Phase 2.
+            </p>
+            <a href="/notes/create" class="btn-create-note">
+                <i class="fas fa-plus"></i>
+                Preview Create Note
+            </a>
+        </div>
+    }
+</div>
 
 @code {
-    // TODO: Add page logic in next phase
+    private bool isLoading = true;
+    private List<NoteDto>? notes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSampleNotes();
+    }
+
+    private async Task LoadSampleNotes()
+    {
+        isLoading = true;
+        StateHasChanged();
+        
+        await Task.Delay(500);
+        
+        notes = new List<NoteDto>
+        {
+            new NoteDto 
+            { 
+                Id = Guid.NewGuid(), 
+                Title = "Welcome to Notely", 
+                Content = "This is sample data. Real note management will be available in Phase 2.",
+                CreatedAt = DateTime.Now.AddDays(-2)
+            },
+            new NoteDto 
+            { 
+                Id = Guid.NewGuid(), 
+                Title = "Phase 1 Complete", 
+                Content = "UI structure is ready. Business logic and data persistence will be implemented in Phase 2.",
+                CreatedAt = DateTime.Now.AddHours(-3)
+            }
+        };
+        
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    public class NoteDto
+    {
+        public Guid Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
+    }
 }
