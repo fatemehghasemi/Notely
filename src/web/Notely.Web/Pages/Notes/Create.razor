@@ -57,13 +57,12 @@
                 Tags
             </label>
 
-=            <label class="form-label">
-                <i class="fas fa-tags"></i>
-                Tags
-            </label>
+            <TagSelector SelectedTag="@selectedTag"
+                         SelectedTagChanged="OnTagChanged" />
 
-            <TagSelector SelectedTags="@selectedTags"
-                         SelectedTagsChanged="OnTagsChanged" />
+            <small class="form-text text-muted">
+                انتخاب یک تگ برای این یادداشت
+            </small>
         </div>
 
         <div class="editor-actions">
@@ -89,7 +88,7 @@
 
 @code {
     [SupplyParameterFromForm]
-    private CreateNoteDto noteModel { get; set; } = new();
+    private CreateNoteDto noteModel { get; set; } = null!;
 
     private bool isSubmitting = false;
 
@@ -98,11 +97,11 @@
         noteModel ??= new();
     }
 
-    private List<string> selectedTags = new();
+    private string selectedTag = string.Empty;
 
-    private void OnTagsChanged(List<string> tags)
+    private void OnTagChanged(string tag)
     {
-        selectedTags = tags ?? new();
+        selectedTag = tag ?? string.Empty;
     }
 
     private async Task HandleValidSubmit()
@@ -112,7 +111,7 @@
 
         try
         {
-            noteModel.Tags = selectedTags.ToList();
+            noteModel.Tags = !string.IsNullOrEmpty(selectedTag) ? new List<string> { selectedTag } : new List<string>();
             await NotesService.CreateNoteAsync(noteModel);
             NavigationManager.NavigateTo("/notes");
         }

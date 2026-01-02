@@ -73,8 +73,7 @@
                     <i class="fas fa-tags"></i>
                     Tags
                 </label>
-            <TagSelector SelectedTags="@selectedTags"   
-                         SelectedTagsChanged="OnTagsChanged" />
+            <TagSelector SelectedTag="@selectedTag" SelectedTagChanged="OnTagChanged" />
             </div>
 
             <div class="editor-actions">
@@ -108,7 +107,7 @@
     private bool isLoading = true;
     private bool isSubmitting = false;
     private bool noteNotFound = false;
-    private List<string> selectedTags = new();
+    private string selectedTag = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -135,7 +134,7 @@
                     Tags = note.Tags
                 };
 
-                selectedTags = note.Tags?.ToList() ?? new List<string>();
+                selectedTag = note.Tags?.FirstOrDefault() ?? string.Empty;
             }
             else
             {
@@ -153,9 +152,9 @@
         }
     }
 
-    private void OnTagsChanged(List<string> tags)
+    private void OnTagChanged(string tag)
     {
-        selectedTags = tags;
+        selectedTag = tag ?? string.Empty;
     }
 
     private async Task HandleValidSubmit()
@@ -165,7 +164,7 @@
 
         try
         {
-            noteModel.Tags = selectedTags.ToList();
+            noteModel.Tags = !string.IsNullOrEmpty(selectedTag) ? new List<string> { selectedTag } : new List<string>();
             await NotesService.UpdateNoteAsync(Id, noteModel);
             NavigationManager.NavigateTo("/notes");
         }
