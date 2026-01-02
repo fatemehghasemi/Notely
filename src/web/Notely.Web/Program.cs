@@ -8,7 +8,6 @@ using Notely.Core.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Blazor Server components only
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
@@ -17,11 +16,9 @@ builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddLocalization();
 
-// Add layer dependencies
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddWebServices(); // Add Web layer services
-
+builder.Services.AddWebServices(); 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -41,7 +38,6 @@ else
 app.UseHttpsRedirection();
 app.UseAntiforgery();
 
-// Map API Controllers
 app.MapControllers();
 
 app.MapStaticAssets();

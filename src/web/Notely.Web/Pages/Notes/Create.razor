@@ -1,4 +1,6 @@
 @page "/notes/create"
+@using Microsoft.AspNetCore.Components.Web
+@using Notely.Web.Components
 @using Shared.DTOs
 @using Notely.Web.Services.AppServices
 @using Microsoft.AspNetCore.Components.Forms
@@ -50,12 +52,18 @@
         </div>
 
         <div class="form-group">
-            <label class="form-label" for="tags">
+            <label class="form-label">
                 <i class="fas fa-tags"></i>
-                Tags (comma-separated)
+                Tags
             </label>
-            <InputText id="tags" class="form-control" @bind-Value="tagsInput" placeholder="Enter tags separated by commas..." />
-            <small class="form-text text-muted">Example: work, important, project</small>
+
+=            <label class="form-label">
+                <i class="fas fa-tags"></i>
+                Tags
+            </label>
+
+            <TagSelector SelectedTags="@selectedTags"
+                         SelectedTagsChanged="OnTagsChanged" />
         </div>
 
         <div class="editor-actions">
@@ -81,14 +89,20 @@
 
 @code {
     [SupplyParameterFromForm]
-    private CreateNoteDto noteModel { get; set; } = null!;
-    
+    private CreateNoteDto noteModel { get; set; } = new();
+
     private bool isSubmitting = false;
-    private string tagsInput = string.Empty;
 
     protected override void OnInitialized()
     {
         noteModel ??= new();
+    }
+
+    private List<string> selectedTags = new();
+
+    private void OnTagsChanged(List<string> tags)
+    {
+        selectedTags = tags ?? new();
     }
 
     private async Task HandleValidSubmit()
@@ -98,15 +112,7 @@
 
         try
         {
-            if (!string.IsNullOrWhiteSpace(tagsInput))
-            {
-                noteModel.Tags = tagsInput
-                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(tag => tag.Trim())
-                    .Where(tag => !string.IsNullOrWhiteSpace(tag))
-                    .ToList();
-            }
-
+            noteModel.Tags = selectedTags.ToList();
             await NotesService.CreateNoteAsync(noteModel);
             NavigationManager.NavigateTo("/notes");
         }
