@@ -1,0 +1,72 @@
+@page "/notes/create"
+@using Shared.DTOs
+@using Notely.Client.Services
+@inject INotesService NotesService
+@inject NavigationManager Navigation
+
+<PageTitle>Create Note</PageTitle>
+
+<h1>Create New Note</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <EditForm Model="@createNoteDto" OnValidSubmit="@HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <InputText id="title" class="form-control" @bind-Value="createNoteDto.Title" />
+                <ValidationMessage For="@(() => createNoteDto.Title)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="content" class="form-label">Content</label>
+                <InputTextArea id="content" class="form-control" rows="10" @bind-Value="createNoteDto.Content" />
+                <ValidationMessage For="@(() => createNoteDto.Content)" />
+            </div>
+
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary me-2" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    }
+                    <i class="fas fa-save"></i> Save Note
+                </button>
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private CreateNoteDto createNoteDto = new();
+    private bool isSubmitting = false;
+
+    private async Task HandleValidSubmit()
+    {
+        isSubmitting = true;
+        try
+        {
+            await NotesService.CreateNoteAsync(createNoteDto);
+            Navigation.NavigateTo("/notes");
+        }
+        catch (Exception ex)
+        {
+            // TODO: Add proper error handling
+            Console.WriteLine($"Error creating note: {ex.Message}");
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/notes");
+    }
+}

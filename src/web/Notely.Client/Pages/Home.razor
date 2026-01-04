@@ -1,0 +1,157 @@
+﻿@page "/"
+
+<PageTitle>Notely - Your Digital Notes</PageTitle>
+
+<div class="home-container">
+    <div class="hero-section">
+        <h1 class="hero-title">
+            <i class="fas fa-sticky-note"></i>
+            Welcome to Notely
+        </h1>
+        <p class="hero-subtitle">
+            Your digital notebook for capturing thoughts, ideas, and important information.
+        </p>
+        <div class="hero-actions">
+            <a href="/notes" class="btn btn-primary btn-lg">
+                <i class="fas fa-book-open"></i>
+                View My Notes
+            </a>
+            <a href="/notes/create" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-plus"></i>
+                Create New Note
+            </a>
+        </div>
+    </div>
+
+    <div class="features-section">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h3>Organize with Tags</h3>
+                    <p>Categorize your notes with tags for easy searching and organization.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Quick Search</h3>
+                    <p>Find your notes instantly with powerful search capabilities.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-thumbtack"></i>
+                    </div>
+                    <h3>Pin Important Notes</h3>
+                    <p>Keep your most important notes at the top for quick access.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.home-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.hero-section {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: #6c757d;
+    margin-bottom: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.hero-actions .btn {
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.features-section {
+    margin-top: 40px;
+}
+
+.feature-card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+    text-align: center;
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    color: #0d6efd;
+    margin-bottom: 20px;
+}
+
+.feature-card h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.feature-card p {
+    color: #6c757d;
+    line-height: 1.6;
+}
+
+@@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .hero-actions .btn {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+    }
+}
+</style>
