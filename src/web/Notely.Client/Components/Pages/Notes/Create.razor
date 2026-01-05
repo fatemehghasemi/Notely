@@ -1,6 +1,6 @@
 @page "/notes/create"
 @using Shared.DTOs
-@using Notely.Client.Services
+@using Notely.Client.Services.Notes
 @inject INotesService NotesService
 @inject NavigationManager Navigation
 
@@ -24,6 +24,13 @@
                 <label for="content" class="form-label">Content</label>
                 <InputTextArea id="content" class="form-control" rows="10" @bind-Value="createNoteDto.Content" />
                 <ValidationMessage For="@(() => createNoteDto.Content)" />
+            </div>
+
+            <div class="mb-3 form-check">
+                <InputCheckbox id="isPinned" class="form-check-input" @bind-Value="createNoteDto.IsPinned" />
+                <label for="isPinned" class="form-check-label">
+                    <i class="fas fa-thumbtack"></i> Pin this note
+                </label>
             </div>
 
             <div class="mb-3">

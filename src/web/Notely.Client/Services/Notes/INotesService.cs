@@ -1,6 +1,6 @@
 using Shared.DTOs;
 
-namespace Notely.Client.Services;
+namespace Notely.Client.Services.Notes;
 
 public interface INotesService
 {

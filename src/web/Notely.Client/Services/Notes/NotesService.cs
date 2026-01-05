@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using Shared.DTOs;
 
-namespace Notely.Client.Services;
+namespace Notely.Client.Services.Notes;
 
 public class NotesService : INotesService
 {

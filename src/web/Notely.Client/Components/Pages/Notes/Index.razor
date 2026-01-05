@@ -1,6 +1,6 @@
 @page "/notes"
 @using Shared.DTOs
-@using Notely.Client.Services
+@using Notely.Client.Services.Notes
 @inject INotesService NotesService
 @inject NavigationManager Navigation
 
@@ -32,7 +32,15 @@ else
             <div class="col-md-4 mb-3">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">@note.Title</h5>
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title">@note.Title</h5>
+                            @if (note.IsPinned)
+                            {
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-thumbtack"></i> Pinned
+                                </span>
+                            }
+                        </div>
                         <p class="card-text">
                             @if (note.Content?.Length > 100)
                             {
@@ -50,8 +58,11 @@ else
                             <button class="btn btn-sm btn-outline-primary me-2" @onclick="() => EditNote(note.Id)">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
-                            <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteNote(note.Id)">
+                            <button class="btn btn-sm btn-outline-danger me-2" @onclick="() => DeleteNote(note.Id)">
                                 <i class="fas fa-trash"></i> Delete
+                            </button>
+                            <button class="btn btn-sm @(note.IsPinned ? "btn-warning" : "btn-outline-warning")" @onclick="() => TogglePin(note.Id, note.IsPinned)">
+                                <i class="fas fa-thumbtack"></i> @(note.IsPinned ? "Unpin" : "Pin")
                             </button>
                         </div>
                     </div>
@@ -107,6 +118,32 @@ else
                 // TODO: Add proper error handling
                 Console.WriteLine($"Error deleting note: {ex.Message}");
             }
+        }
+    }
+
+    private async Task TogglePin(Guid id, bool currentPinStatus)
+    {
+        try
+        {
+            var note = await NotesService.GetNoteAsync(id);
+            if (note != null)
+            {
+                var updateDto = new UpdateNoteDto
+                {
+                    Title = note.Title,
+                    Content = note.Content,
+                    IsPinned = !currentPinStatus,
+                    CategoryId = note.CategoryId,
+                    Tags = note.Tags
+                };
+                
+                await NotesService.UpdateNoteAsync(id, updateDto);
+                await LoadNotes(); // Refresh the list
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error toggling pin: {ex.Message}");
         }
     }
 

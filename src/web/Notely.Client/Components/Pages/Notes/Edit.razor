@@ -1,0 +1,118 @@
+@page "/notes/edit/{id:guid}"
+@using Shared.DTOs
+@using Notely.Client.Services.Notes
+@inject INotesService NotesService
+@inject NavigationManager Navigation
+
+<PageTitle>Edit Note</PageTitle>
+
+<h1>Edit Note</h1>
+
+@if (updateNoteDto == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-8">
+            <EditForm Model="@updateNoteDto" OnValidSubmit="@HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <InputText id="title" class="form-control" @bind-Value="updateNoteDto.Title" />
+                    <ValidationMessage For="@(() => updateNoteDto.Title)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="content" class="form-label">Content</label>
+                    <InputTextArea id="content" class="form-control" rows="10" @bind-Value="updateNoteDto.Content" />
+                    <ValidationMessage For="@(() => updateNoteDto.Content)" />
+                </div>
+
+                <div class="mb-3 form-check">
+                    <InputCheckbox id="isPinned" class="form-check-input" @bind-Value="updateNoteDto.IsPinned" />
+                    <label for="isPinned" class="form-check-label">
+                        <i class="fas fa-thumbtack"></i> Pin this note
+                    </label>
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary me-2" disabled="@isSubmitting">
+                        @if (isSubmitting)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        }
+                        <i class="fas fa-save"></i> Update Note
+                    </button>
+                    <button type="button" class="btn btn-secondary" @onclick="Cancel">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    
+    private UpdateNoteDto? updateNoteDto;
+    private bool isSubmitting = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadNote();
+    }
+
+    private async Task LoadNote()
+    {
+        try
+        {
+            var note = await NotesService.GetNoteAsync(Id);
+            if (note != null)
+            {
+                updateNoteDto = new UpdateNoteDto
+                {
+                    Title = note.Title,
+                    Content = note.Content,
+                    IsPinned = note.IsPinned,
+                    CategoryId = note.CategoryId,
+                    Tags = note.Tags
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading note: {ex.Message}");
+            Navigation.NavigateTo("/notes");
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (updateNoteDto == null) return;
+        
+        isSubmitting = true;
+        try
+        {
+            await NotesService.UpdateNoteAsync(Id, updateNoteDto);
+            Navigation.NavigateTo("/notes");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating note: {ex.Message}");
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/notes");
+    }
+}
