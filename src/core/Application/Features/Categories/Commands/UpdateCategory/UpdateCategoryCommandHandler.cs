@@ -25,7 +25,6 @@ public sealed class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategor
         }
 
         category.Title = request.Title;
-        // UpdatedAt خودکار در SaveChangesAsync تنظیم می‌شود
 
         var updatedCategory = await _categoryRepository.UpdateAsync(category, cancellationToken);
         var response = updatedCategory.Adapt<UpdateCategoryResponse>();

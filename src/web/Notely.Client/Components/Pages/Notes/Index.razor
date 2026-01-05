@@ -34,12 +34,20 @@ else
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <h5 class="card-title">@note.Title</h5>
-                            @if (note.IsPinned)
-                            {
-                                <span class="badge bg-warning text-dark">
-                                    <i class="fas fa-thumbtack"></i> Pinned
-                                </span>
-                            }
+                            <div class="d-flex gap-2">
+                                @if (!string.IsNullOrEmpty(note.CategoryName))
+                                {
+                                    <span class="badge bg-info text-dark">
+                                        <i class="fas fa-folder"></i> @note.CategoryName
+                                    </span>
+                                }
+                                @if (note.IsPinned)
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-thumbtack"></i> Pinned
+                                    </span>
+                                }
+                            </div>
                         </div>
                         <p class="card-text">
                             @if (note.Content?.Length > 100)

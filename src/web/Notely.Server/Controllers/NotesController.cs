@@ -27,7 +27,6 @@ public class NotesController : ControllerBase
         
         if (result.IsSuccess && result.Data != null)
         {
-            // Convert from Application response to Shared DTO
             var noteDtos = result.Data.Notes.Select(note => new NoteDto
             {
                 Id = note.Id,
@@ -54,7 +53,6 @@ public class NotesController : ControllerBase
         
         if (result.IsSuccess && result.Data != null)
         {
-            // Convert from Application response to Shared DTO
             var noteDto = new NoteDto
             {
                 Id = result.Data.Id,
@@ -95,7 +93,6 @@ public class NotesController : ControllerBase
         
         if (result.IsSuccess && result.Data != null)
         {
-            // For create, we need to get the full note details
             var getResult = await _mediator.Send(new GetNoteByIdQuery(result.Data.Id));
             
             if (getResult.IsSuccess && getResult.Data != null)
@@ -136,7 +133,6 @@ public class NotesController : ControllerBase
         
         if (result.IsSuccess)
         {
-            // Get the updated note details
             var getResult = await _mediator.Send(new GetNoteByIdQuery(id));
             
             if (getResult.IsSuccess && getResult.Data != null)
