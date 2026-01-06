@@ -19,14 +19,7 @@ public sealed class GetAllCategoriesQueryHandler : IRequestHandler<GetAllCategor
     {
         var categories = await _categoryRepository.GetAllWithNotesCountAsync(cancellationToken);
         
-        var categoryItems = categories.Select(c => new CategoryItem
-        {
-            Id = c.Id,
-            Title = c.Title,
-            NotesCount = c.Notes?.Count ?? 0,
-            CreatedAt = c.CreatedAt,
-            UpdatedAt = c.UpdatedAt
-        }).ToList();
+        var categoryItems = categories.Adapt<List<CategoryItem>>();
 
         var response = new GetAllCategoriesResponse
         {

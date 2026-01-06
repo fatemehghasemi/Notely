@@ -3,6 +3,7 @@ using Notely.Core.Application.Interfaces.Repositories;
 using Notely.Core.Application.Responses.Notes;
 using Notely.Core.Domain.Entities;
 using Shared.Wrapper;
+using Mapster;
 
 namespace Notely.Core.Application.Features.Notes.Commands.UpdateNote;
 
@@ -64,12 +65,7 @@ public class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand, Resul
 
             var updatedNote = await _noteRepository.UpdateAsync(note, cancellationToken);
 
-            var response = new UpdateNoteResponse
-            {
-                Id = updatedNote.Id,
-                Title = updatedNote.Title,
-                UpdatedAt = updatedNote.UpdatedAt ?? updatedNote.CreatedAt
-            };
+            var response = updatedNote.Adapt<UpdateNoteResponse>();
 
             return Result<UpdateNoteResponse>.Success(response);
         }

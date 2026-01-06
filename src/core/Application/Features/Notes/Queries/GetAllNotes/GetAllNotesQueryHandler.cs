@@ -21,18 +21,7 @@ public class GetAllNotesQueryHandler : IRequestHandler<GetAllNotesQuery, Result<
         {
             var notes = await _noteRepository.GetAllWithDetailsAsync(cancellationToken);
 
-            var noteItems = notes.Select(note => new NoteItem
-            {
-                Id = note.Id,
-                Title = note.Title,
-                Content = note.Content,
-                IsPinned = note.IsPinned,
-                CategoryId = note.CategoryId,
-                CategoryName = note.Category?.Title,
-                Tags = note.NoteTags?.Select(nt => nt.Tag.Title).ToList() ?? new List<string>(),
-                CreatedAt = note.CreatedAt,
-                UpdatedAt = note.UpdatedAt ?? note.CreatedAt
-            }).ToList();
+            var noteItems = notes.Adapt<List<NoteItem>>();
 
             var response = new GetAllNotesResponse
             {

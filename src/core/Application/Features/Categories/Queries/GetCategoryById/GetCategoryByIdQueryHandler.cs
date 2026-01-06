@@ -24,21 +24,7 @@ public sealed class GetCategoryByIdQueryHandler : IRequestHandler<GetCategoryByI
             return Result<GetCategoryByIdResponse?>.Failure("Category not found");
         }
 
-        var response = new GetCategoryByIdResponse
-        {
-            Id = category.Id,
-            Title = category.Title,
-            NotesCount = category.Notes?.Count ?? 0,
-            Notes = category.Notes?.Select(n => new CategoryNoteItem
-            {
-                Id = n.Id,
-                Title = n.Title,
-                Content = n.Content.Length > 100 ? n.Content.Substring(0, 100) + "..." : n.Content,
-                CreatedAt = n.CreatedAt
-            }).ToList() ?? new List<CategoryNoteItem>(),
-            CreatedAt = category.CreatedAt,
-            UpdatedAt = category.UpdatedAt
-        };
+        var response = category.Adapt<GetCategoryByIdResponse>();
 
         return Result<GetCategoryByIdResponse?>.Success(response);
     }

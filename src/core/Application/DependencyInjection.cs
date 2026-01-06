@@ -3,6 +3,7 @@ using Mapster;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Notely.Core.Application.Common.Behaviors;
+using Notely.Core.Application.Common.Mappings;
 using System.Reflection;
 
 namespace Notely.Core.Application;
@@ -17,6 +18,8 @@ public static class DependencyInjection
         
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
+        // Configure Mapster mappings
+        MappingConfig.RegisterMappings();
         TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
 
         return services;

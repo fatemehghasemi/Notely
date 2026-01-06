@@ -2,6 +2,7 @@ using MediatR;
 using Notely.Core.Application.Interfaces.Repositories;
 using Notely.Core.Application.Responses.Notes;
 using Shared.Wrapper;
+using Mapster;
 
 namespace Notely.Core.Application.Features.Notes.Queries.GetNoteById;
 
@@ -25,18 +26,7 @@ public class GetNoteByIdQueryHandler : IRequestHandler<GetNoteByIdQuery, Result<
                 return Result<GetNoteByIdResponse?>.Success(null);
             }
 
-            var response = new GetNoteByIdResponse
-            {
-                Id = note.Id,
-                Title = note.Title,
-                Content = note.Content,
-                IsPinned = note.IsPinned,
-                CategoryId = note.CategoryId,
-                CategoryName = note.Category?.Title,
-                Tags = note.NoteTags?.Select(nt => nt.Tag.Title).ToList() ?? new List<string>(),
-                CreatedAt = note.CreatedAt,
-                UpdatedAt = note.UpdatedAt ?? note.CreatedAt
-            };
+            var response = note.Adapt<GetNoteByIdResponse>();
 
             return Result<GetNoteByIdResponse?>.Success(response);
         }

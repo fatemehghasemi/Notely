@@ -6,6 +6,7 @@ using Notely.Core.Application.Features.Notes.Commands.UpdateNote;
 using Notely.Core.Application.Features.Notes.Commands.DeleteNote;
 using Notely.Core.Application.Features.Notes.Queries.GetAllNotes;
 using Notely.Core.Application.Features.Notes.Queries.GetNoteById;
+using Mapster;
 
 namespace Notely.Server.Controllers;
 
@@ -97,19 +98,7 @@ public class NotesController : ControllerBase
             
             if (getResult.IsSuccess && getResult.Data != null)
             {
-                var noteDto = new NoteDto
-                {
-                    Id = getResult.Data.Id,
-                    Title = getResult.Data.Title,
-                    Content = getResult.Data.Content,
-                    IsPinned = getResult.Data.IsPinned,
-                    CategoryId = getResult.Data.CategoryId,
-                    CategoryName = getResult.Data.CategoryName,
-                    Tags = getResult.Data.Tags,
-                    CreatedAt = getResult.Data.CreatedAt,
-                    UpdatedAt = getResult.Data.UpdatedAt
-                };
-                
+                var noteDto = getResult.Data.Adapt<NoteDto>();
                 return CreatedAtAction(nameof(GetNote), new { id = noteDto.Id }, noteDto);
             }
         }
@@ -137,19 +126,7 @@ public class NotesController : ControllerBase
             
             if (getResult.IsSuccess && getResult.Data != null)
             {
-                var noteDto = new NoteDto
-                {
-                    Id = getResult.Data.Id,
-                    Title = getResult.Data.Title,
-                    Content = getResult.Data.Content,
-                    IsPinned = getResult.Data.IsPinned,
-                    CategoryId = getResult.Data.CategoryId,
-                    CategoryName = getResult.Data.CategoryName,
-                    Tags = getResult.Data.Tags,
-                    CreatedAt = getResult.Data.CreatedAt,
-                    UpdatedAt = getResult.Data.UpdatedAt
-                };
-                
+                var noteDto = getResult.Data.Adapt<NoteDto>();
                 return Ok(noteDto);
             }
         }
