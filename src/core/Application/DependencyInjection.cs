@@ -18,7 +18,6 @@ public static class DependencyInjection
         
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
-        // Configure Mapster mappings
         MappingConfig.RegisterMappings();
         TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
 
