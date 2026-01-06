@@ -96,7 +96,6 @@ else
         }
         catch (Exception ex)
         {
-            // TODO: Add proper error handling/logging
             Console.WriteLine($"Error loading notes: {ex.Message}");
             notes = Enumerable.Empty<NoteDto>();
         }
@@ -119,11 +118,10 @@ else
             try
             {
                 await NotesService.DeleteNoteAsync(id);
-                await LoadNotes(); // Refresh the list
+                await LoadNotes(); 
             }
             catch (Exception ex)
             {
-                // TODO: Add proper error handling
                 Console.WriteLine($"Error deleting note: {ex.Message}");
             }
         }
@@ -146,7 +144,7 @@ else
                 };
                 
                 await NotesService.UpdateNoteAsync(id, updateDto);
-                await LoadNotes(); // Refresh the list
+                await LoadNotes(); 
             }
         }
         catch (Exception ex)
@@ -157,7 +155,6 @@ else
 
     private bool confirm(string message)
     {
-        // TODO: Replace with proper modal dialog
-        return true; // For now, always confirm
+        return true; 
     }
 }

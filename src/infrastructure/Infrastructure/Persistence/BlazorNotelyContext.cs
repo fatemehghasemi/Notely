@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Notely.Core.Domain.Common;
 using Notely.Core.Domain.Entities;
 
@@ -9,7 +9,6 @@ public class BlazorNotelyContext : DbContext
     public BlazorNotelyContext(DbContextOptions<BlazorNotelyContext> options)
         : base(options) { }
 
-    // DbSets
     public DbSet<Note> Notes => Set<Note>();
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Tag> Tags => Set<Tag>();

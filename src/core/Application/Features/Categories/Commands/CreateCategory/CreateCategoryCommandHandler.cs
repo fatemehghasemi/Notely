@@ -22,8 +22,6 @@ public sealed class CreateCategoryCommandHandler : IRequestHandler<CreateCategor
         {
             Id = Guid.NewGuid(),
             Title = request.Title
-            // CreatedAt خودکار در SaveChangesAsync تنظیم می‌شود
-            // UpdatedAt = null (default) چون هنوز update نشده
         };
 
         var createdCategory = await _categoryRepository.AddAsync(category, cancellationToken);

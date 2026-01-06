@@ -16,13 +16,11 @@ public class NullableGuidConverter : JsonConverter<Guid?>
         {
             var stringValue = reader.GetString();
             
-            // Handle empty string as null
             if (string.IsNullOrEmpty(stringValue))
             {
                 return null;
             }
 
-            // Try to parse the Guid
             if (Guid.TryParse(stringValue, out var guid))
             {
                 return guid;
