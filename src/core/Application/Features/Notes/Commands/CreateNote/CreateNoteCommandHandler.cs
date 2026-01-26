@@ -7,7 +7,7 @@ using Shared.Wrapper;
 
 namespace Notely.Core.Application.Features.Notes.Commands.CreateNote;
 
-public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Result<CreateNoteResponse>>
+public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Result<NoteResponse>>
 {
     private readonly INoteRepository _noteRepository;
     private readonly ITagRepository _tagRepository;
@@ -18,7 +18,7 @@ public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Resul
         _tagRepository = tagRepository;
     }
 
-    public async Task<Result<CreateNoteResponse>> Handle(CreateNoteCommand request, CancellationToken cancellationToken)
+    public async Task<Result<NoteResponse>> Handle(CreateNoteCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -61,13 +61,13 @@ public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Resul
 
             var createdNote = await _noteRepository.AddAsync(note, cancellationToken);
 
-            var response = createdNote.Adapt<CreateNoteResponse>();
+            var response = createdNote.Adapt<NoteResponse>();
 
-            return Result<CreateNoteResponse>.Success(response);
+            return Result<NoteResponse>.Success(response);
         }
         catch (Exception ex)
         {
-            return Result<CreateNoteResponse>.Failure($"Failed to create note: {ex.Message}");
+            return Result<NoteResponse>.Failure($"Failed to create note: {ex.Message}");
         }
     }
 }

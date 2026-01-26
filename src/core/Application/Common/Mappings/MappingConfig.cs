@@ -26,10 +26,7 @@ public static class MappingConfig
             .Map(dest => dest.CategoryName, src => src.Category != null ? src.Category.Title : null)
             .Map(dest => dest.Tags, src => src.NoteTags != null ? src.NoteTags.Select(nt => nt.Tag.Title).ToList() : new List<string>());
 
-        TypeAdapterConfig<Note, CreateNoteResponse>.NewConfig();
-        
-        TypeAdapterConfig<Note, UpdateNoteResponse>.NewConfig()
-            .Map(dest => dest.UpdatedAt, src => src.UpdatedAt ?? src.CreatedAt);
+        TypeAdapterConfig<Note, NoteResponse>.NewConfig();
 
         TypeAdapterConfig<Category, CategoryResponse>.NewConfig();
         
@@ -45,7 +42,6 @@ public static class MappingConfig
 
         TypeAdapterConfig<GetCategoryByIdResponse, CategoryDto>.NewConfig();
 
-        // Tag mappings
         TypeAdapterConfig<Tag, TagResponse>.NewConfig();
 
         TypeAdapterConfig<Tag, TagItem>.NewConfig();

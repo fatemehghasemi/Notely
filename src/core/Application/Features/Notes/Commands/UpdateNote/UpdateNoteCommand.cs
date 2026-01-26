@@ -11,4 +11,4 @@ public record UpdateNoteCommand(
     bool IsPinned,
     Guid? CategoryId = null,
     List<string>? Tags = null
-) : IRequest<Result<UpdateNoteResponse>>;
+) : IRequest<Result<NoteResponse>>;

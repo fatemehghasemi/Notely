@@ -10,4 +10,4 @@ public record CreateNoteCommand(
     bool IsPinned = false,
     Guid? CategoryId = null,
     List<string>? Tags = null
-) : IRequest<Result<CreateNoteResponse>>;
+) : IRequest<Result<NoteResponse>>;

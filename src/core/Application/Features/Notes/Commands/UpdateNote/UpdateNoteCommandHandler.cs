@@ -7,7 +7,7 @@ using Mapster;
 
 namespace Notely.Core.Application.Features.Notes.Commands.UpdateNote;
 
-public class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand, Result<UpdateNoteResponse>>
+public class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand, Result<NoteResponse>>
 {
     private readonly INoteRepository _noteRepository;
     private readonly ITagRepository _tagRepository;
@@ -18,14 +18,14 @@ public class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand, Resul
         _tagRepository = tagRepository;
     }
 
-    public async Task<Result<UpdateNoteResponse>> Handle(UpdateNoteCommand request, CancellationToken cancellationToken)
+    public async Task<Result<NoteResponse>> Handle(UpdateNoteCommand request, CancellationToken cancellationToken)
     {
         try
         {
             var note = await _noteRepository.GetByIdWithDetailsAsync(request.Id, cancellationToken);
             if (note == null)
             {
-                return Result<UpdateNoteResponse>.Failure($"Note with ID {request.Id} not found.");
+                return Result<NoteResponse>.Failure($"Note with ID {request.Id} not found.");
             }
 
             note.Title = request.Title;
@@ -65,13 +65,13 @@ public class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand, Resul
 
             var updatedNote = await _noteRepository.UpdateAsync(note, cancellationToken);
 
-            var response = updatedNote.Adapt<UpdateNoteResponse>();
+            var response = updatedNote.Adapt<NoteResponse>();
 
-            return Result<UpdateNoteResponse>.Success(response);
+            return Result<NoteResponse>.Success(response);
         }
         catch (Exception ex)
         {
-            return Result<UpdateNoteResponse>.Failure($"Failed to update note: {ex.Message}");
+            return Result<NoteResponse>.Failure($"Failed to update note: {ex.Message}");
         }
     }
 }
