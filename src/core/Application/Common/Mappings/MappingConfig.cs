@@ -47,9 +47,10 @@ public static class MappingConfig
 
         TypeAdapterConfig<GetCategoryByIdResponse, CategoryDto>.NewConfig();
 
-        TypeAdapterConfig<Tag, CreateTagResponse>.NewConfig();
-        
-        TypeAdapterConfig<Tag, UpdateTagResponse>.NewConfig();
+        // Tag mappings
+        TypeAdapterConfig<Tag, TagResponse>.NewConfig();
+
+        TypeAdapterConfig<Tag, TagItem>.NewConfig();
 
         TypeAdapterConfig<Tag, GetTagByIdResponse>.NewConfig()
             .Map(dest => dest.NotesCount, src => src.NoteTags != null ? src.NoteTags.Count : 0);

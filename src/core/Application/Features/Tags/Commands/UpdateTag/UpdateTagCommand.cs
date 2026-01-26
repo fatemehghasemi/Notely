@@ -4,4 +4,4 @@ using Shared.Wrapper;
 
 namespace Notely.Core.Application.Features.Tags.Commands.UpdateTag;
 
-public record UpdateTagCommand(Guid Id, string Title) : IRequest<Result<UpdateTagResponse>>;
+public record UpdateTagCommand(Guid Id, string Title) : IRequest<Result<TagResponse>>;

@@ -7,7 +7,7 @@ using Shared.Wrapper;
 
 namespace Notely.Core.Application.Features.Tags.Commands.CreateTag;
 
-public sealed class CreateTagCommandHandler : IRequestHandler<CreateTagCommand, Result<CreateTagResponse>>
+public sealed class CreateTagCommandHandler : IRequestHandler<CreateTagCommand, Result<TagResponse>>
 {
     private readonly ITagRepository _tagRepository;
 
@@ -16,12 +16,12 @@ public sealed class CreateTagCommandHandler : IRequestHandler<CreateTagCommand, 
         _tagRepository = tagRepository;
     }
 
-    public async Task<Result<CreateTagResponse>> Handle(CreateTagCommand request, CancellationToken cancellationToken)
+    public async Task<Result<TagResponse>> Handle(CreateTagCommand request, CancellationToken cancellationToken)
     {
         var existingTag = await _tagRepository.GetByTitleAsync(request.Title, cancellationToken);
         if (existingTag != null)
         {
-            return Result<CreateTagResponse>.Failure("A tag with this title already exists");
+            return Result<TagResponse>.Failure("A tag with this title already exists");
         }
 
         var tag = new Tag
@@ -32,8 +32,8 @@ public sealed class CreateTagCommandHandler : IRequestHandler<CreateTagCommand, 
         };
 
         var createdTag = await _tagRepository.AddAsync(tag, cancellationToken);
-        var response = createdTag.Adapt<CreateTagResponse>();
+        var response = createdTag.Adapt<TagResponse>();
 
-        return Result<CreateTagResponse>.Success(response);
+        return Result<TagResponse>.Success(response);
     }
 }

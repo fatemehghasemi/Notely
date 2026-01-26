@@ -6,7 +6,7 @@ using Shared.Wrapper;
 
 namespace Notely.Core.Application.Features.Tags.Commands.UpdateTag;
 
-public sealed class UpdateTagCommandHandler : IRequestHandler<UpdateTagCommand, Result<UpdateTagResponse>>
+public sealed class UpdateTagCommandHandler : IRequestHandler<UpdateTagCommand, Result<TagResponse>>
 {
     private readonly ITagRepository _tagRepository;
 
@@ -15,27 +15,27 @@ public sealed class UpdateTagCommandHandler : IRequestHandler<UpdateTagCommand, 
         _tagRepository = tagRepository;
     }
 
-    public async Task<Result<UpdateTagResponse>> Handle(UpdateTagCommand request, CancellationToken cancellationToken)
+    public async Task<Result<TagResponse>> Handle(UpdateTagCommand request, CancellationToken cancellationToken)
     {
         var tag = await _tagRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (tag == null)
         {
-            return Result<UpdateTagResponse>.Failure("Tag not found");
+            return Result<TagResponse>.Failure("Tag not found");
         }
 
         var existingTag = await _tagRepository.GetByTitleAsync(request.Title, cancellationToken);
         if (existingTag != null && existingTag.Id != request.Id)
         {
-            return Result<UpdateTagResponse>.Failure("A tag with this title already exists");
+            return Result<TagResponse>.Failure("A tag with this title already exists");
         }
 
         tag.Title = request.Title;
         tag.UpdatedAt = DateTime.UtcNow;
 
         var updatedTag = await _tagRepository.UpdateAsync(tag, cancellationToken);
-        var response = updatedTag.Adapt<UpdateTagResponse>();
+        var response = updatedTag.Adapt<TagResponse>();
 
-        return Result<UpdateTagResponse>.Success(response);
+        return Result<TagResponse>.Success(response);
     }
 }

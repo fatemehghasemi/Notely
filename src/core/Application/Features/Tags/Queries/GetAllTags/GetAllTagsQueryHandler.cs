@@ -22,10 +22,12 @@ public class GetAllTagsQueryHandler : IRequestHandler<GetAllTagsQuery, Result<Ge
             
             var response = new GetAllTagsResponse
             {
-                Tags = tags.Select(tag => new TagResponse
+                Tags = tags.Select(tag => new TagItem
                 {
                     Id = tag.Id,
-                    Title = tag.Title
+                    Title = tag.Title,
+                    CreatedAt = tag.CreatedAt,
+                    UpdatedAt = tag.UpdatedAt
                 }).ToList()
             };
 
