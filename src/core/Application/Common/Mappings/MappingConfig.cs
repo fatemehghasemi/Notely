@@ -1,6 +1,7 @@
 using Mapster;
 using Notely.Core.Application.Responses.Categories;
 using Notely.Core.Application.Responses.Notes;
+using Notely.Core.Application.Responses.Tags;
 using Notely.Core.Domain.Entities;
 using Shared.DTOs;
 
@@ -45,6 +46,13 @@ public static class MappingConfig
             }).ToList() : new List<CategoryNoteItem>());
 
         TypeAdapterConfig<GetCategoryByIdResponse, CategoryDto>.NewConfig();
+
+        TypeAdapterConfig<Tag, CreateTagResponse>.NewConfig();
+        
+        TypeAdapterConfig<Tag, UpdateTagResponse>.NewConfig();
+
+        TypeAdapterConfig<Tag, GetTagByIdResponse>.NewConfig()
+            .Map(dest => dest.NotesCount, src => src.NoteTags != null ? src.NoteTags.Count : 0);
 
         TypeAdapterConfig<CreateNoteDto, Note>.NewConfig()
             .Map(dest => dest.Id, src => Guid.NewGuid())
