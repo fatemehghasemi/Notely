@@ -6,7 +6,7 @@ using Shared.Wrapper;
 
 namespace Notely.Core.Application.Features.Categories.Commands.UpdateCategory;
 
-public sealed class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryCommand, Result<UpdateCategoryResponse>>
+public sealed class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryCommand, Result<CategoryResponse>>
 {
     private readonly ICategoryRepository _categoryRepository;
 
@@ -15,20 +15,20 @@ public sealed class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategor
         _categoryRepository = categoryRepository;
     }
 
-    public async Task<Result<UpdateCategoryResponse>> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<Result<CategoryResponse>> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
     {
         var category = await _categoryRepository.GetByIdAsync(request.Id, cancellationToken);
         
         if (category == null)
         {
-            return Result<UpdateCategoryResponse>.Failure("Category not found");
+            return Result<CategoryResponse>.Failure("Category not found");
         }
 
         category.Title = request.Title;
 
         var updatedCategory = await _categoryRepository.UpdateAsync(category, cancellationToken);
-        var response = updatedCategory.Adapt<UpdateCategoryResponse>();
+        var response = updatedCategory.Adapt<CategoryResponse>();
 
-        return Result<UpdateCategoryResponse>.Success(response);
+        return Result<CategoryResponse>.Success(response);
     }
 }

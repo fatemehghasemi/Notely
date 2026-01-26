@@ -4,4 +4,4 @@ using Shared.Wrapper;
 
 namespace Notely.Core.Application.Features.Categories.Commands.CreateCategory;
 
-public record CreateCategoryCommand(string Title) : IRequest<Result<CreateCategoryResponse>>;
+public record CreateCategoryCommand(string Title) : IRequest<Result<CategoryResponse>>;

@@ -7,7 +7,7 @@ using Shared.Wrapper;
 
 namespace Notely.Core.Application.Features.Categories.Commands.CreateCategory;
 
-public sealed class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, Result<CreateCategoryResponse>>
+public sealed class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, Result<CategoryResponse>>
 {
     private readonly ICategoryRepository _categoryRepository;
 
@@ -16,7 +16,7 @@ public sealed class CreateCategoryCommandHandler : IRequestHandler<CreateCategor
         _categoryRepository = categoryRepository;
     }
 
-    public async Task<Result<CreateCategoryResponse>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<Result<CategoryResponse>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
     {
         var category = new Category
         {
@@ -25,8 +25,8 @@ public sealed class CreateCategoryCommandHandler : IRequestHandler<CreateCategor
         };
 
         var createdCategory = await _categoryRepository.AddAsync(category, cancellationToken);
-        var response = createdCategory.Adapt<CreateCategoryResponse>();
+        var response = createdCategory.Adapt<CategoryResponse>();
 
-        return Result<CreateCategoryResponse>.Success(response);
+        return Result<CategoryResponse>.Success(response);
     }
 }

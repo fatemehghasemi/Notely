@@ -31,10 +31,8 @@ public static class MappingConfig
         TypeAdapterConfig<Note, UpdateNoteResponse>.NewConfig()
             .Map(dest => dest.UpdatedAt, src => src.UpdatedAt ?? src.CreatedAt);
 
-        TypeAdapterConfig<Category, CreateCategoryResponse>.NewConfig();
+        TypeAdapterConfig<Category, CategoryResponse>.NewConfig();
         
-        TypeAdapterConfig<Category, UpdateCategoryResponse>.NewConfig();
-
         TypeAdapterConfig<Category, GetCategoryByIdResponse>.NewConfig()
             .Map(dest => dest.NotesCount, src => src.Notes != null ? src.Notes.Count : 0)
             .Map(dest => dest.Notes, src => src.Notes != null ? src.Notes.Select(n => new CategoryNoteItem
