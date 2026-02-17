@@ -1,0 +1,115 @@
+@page "/categories/edit/{id:guid}"
+@using Shared.DTOs
+@inject ICategoriesService CategoriesService
+@inject NavigationManager Navigation
+
+<PageTitle>Edit Category</PageTitle>
+
+<h1>Edit Category</h1>
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@if (updateCategoryDto == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-6">
+            <EditForm Model="@updateCategoryDto" OnValidSubmit="@HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <InputText id="title" class="form-control" @bind-Value="updateCategoryDto.Title" />
+                    <ValidationMessage For="@(() => updateCategoryDto.Title)" />
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary me-2" disabled="@isSubmitting">
+                        @if (isSubmitting)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        }
+                        Update Category
+                    </button>
+                    <button type="button" class="btn btn-secondary" @onclick="Cancel">
+                        Cancel
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private UpdateCategoryDto? updateCategoryDto;
+    private bool isSubmitting;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategory();
+    }
+
+    private async Task LoadCategory()
+    {
+        errorMessage = null;
+        try
+        {
+            var category = await CategoriesService.GetCategoryAsync(Id);
+            if (category == null)
+            {
+                Navigation.NavigateTo("/categories");
+                return;
+            }
+
+            updateCategoryDto = new UpdateCategoryDto
+            {
+                Title = category.Title
+            };
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Unable to load category.";
+            Console.WriteLine($"Error loading category: {ex.Message}");
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (updateCategoryDto == null)
+        {
+            return;
+        }
+
+        isSubmitting = true;
+        errorMessage = null;
+        try
+        {
+            await CategoriesService.UpdateCategoryAsync(Id, updateCategoryDto);
+            Navigation.NavigateTo("/categories");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Unable to update category. Please try a different title.";
+            Console.WriteLine($"Error updating category: {ex.Message}");
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/categories");
+    }
+}

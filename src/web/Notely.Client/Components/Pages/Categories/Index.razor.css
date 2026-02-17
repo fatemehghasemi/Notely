@@ -1,0 +1,10 @@
+.categories-title {
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.categories-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}

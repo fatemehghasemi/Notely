@@ -1,0 +1,126 @@
+@page "/categories"
+@using Shared.DTOs
+@inject ICategoriesService CategoriesService
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>Categories</PageTitle>
+
+<h1 class="categories-title">Categories</h1>
+
+<div class="categories-toolbar">
+    <button class="btn btn-primary" @onclick="CreateCategory">
+        <i class="fas fa-plus"></i> Create Category
+    </button>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@if (isLoading)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!categories.Any())
+{
+    <div class="alert alert-info">No categories found.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Notes</th>
+                    <th>Created</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var category in categories.OrderBy(c => c.Title))
+                {
+                    <tr @key="category.Id">
+                        <td>@category.Title</td>
+                        <td>
+                            <span class="badge bg-secondary">@category.NotesCount</span>
+                        </td>
+                        <td>@category.CreatedAt.ToString("MMM dd, yyyy")</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-primary me-2" @onclick="() => EditCategory(category.Id)">
+                                Edit
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteCategory(category.Id)">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private readonly List<CategoryDto> categories = new();
+    private bool isLoading = true;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategories();
+    }
+
+    private async Task LoadCategories()
+    {
+        isLoading = true;
+        errorMessage = null;
+        try
+        {
+            var result = await CategoriesService.GetCategoriesAsync();
+            categories.Clear();
+            categories.AddRange(result);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Unable to load categories. Please try again.";
+            Console.WriteLine($"Error loading categories: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void CreateCategory()
+    {
+        Navigation.NavigateTo("/categories/create");
+    }
+
+    private void EditCategory(Guid id)
+    {
+        Navigation.NavigateTo($"/categories/edit/{id}");
+    }
+
+    private async Task DeleteCategory(Guid id)
+    {
+        var shouldDelete = await JS.InvokeAsync<bool>("confirm", "Are you sure you want to delete this category?");
+        if (!shouldDelete)
+        {
+            return;
+        }
+
+        try
+        {
+            await CategoriesService.DeleteCategoryAsync(id);
+            await LoadCategories();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Unable to delete category. Make sure it is not used by any note.";
+            Console.WriteLine($"Error deleting category: {ex.Message}");
+        }
+    }
+}
