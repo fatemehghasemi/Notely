@@ -14,16 +14,21 @@
         <input
             class="form-control notes-search"
             placeholder="Search by title, content, or category"
-            @bind="searchTerm"
-            @bind:event="oninput" />
+            value="@searchTerm"
+            @oninput="OnSearchChanged" />
         <div class="form-check">
-            <InputCheckbox id="pinnedOnly" class="form-check-input" @bind-Value="pinnedOnly" />
+            <InputCheckbox id="pinnedOnly" class="form-check-input" Value="pinnedOnly" ValueChanged="OnPinnedOnlyChanged" />
             <label for="pinnedOnly" class="form-check-label">Pinned only</label>
         </div>
-        <select class="form-select notes-sort" @bind="sortBy">
+        <select class="form-select notes-sort" value="@sortBy" @onchange="OnSortChanged">
             <option value="@SortMode.Newest">Newest</option>
             <option value="@SortMode.Oldest">Oldest</option>
             <option value="@SortMode.Title">Title</option>
+        </select>
+        <select class="form-select notes-page-size" value="@pageSize" @onchange="OnPageSizeChanged">
+            <option value="6">6 / page</option>
+            <option value="9">9 / page</option>
+            <option value="12">12 / page</option>
         </select>
     </div>
     <button class="btn btn-primary" @onclick="CreateNote">
@@ -48,9 +53,9 @@ else if (!FilteredNotes.Any())
 }
 else
 {
-    <p class="notes-meta">Showing @FilteredNotes.Count() of @allNotes.Count</p>
+    <p class="notes-meta">Showing @PagedNotes.Count() of @FilteredCount filtered notes (@allNotes.Count total)</p>
     <div class="row">
-        @foreach (var note in FilteredNotes)
+        @foreach (var note in PagedNotes)
         {
             <div class="col-md-4 mb-3">
                 <div class="card note-card @GetPinnedClass(note.IsPinned)" @key="note.Id">
@@ -101,6 +106,15 @@ else
             </div>
         }
     </div>
+    <div class="notes-pagination">
+        <button class="btn btn-outline-secondary" @onclick="GoToPreviousPage" disabled="@(CurrentPage <= 1)">
+            Previous
+        </button>
+        <span class="notes-page-indicator">Page @CurrentPage of @TotalPages</span>
+        <button class="btn btn-outline-secondary" @onclick="GoToNextPage" disabled="@(CurrentPage >= TotalPages)">
+            Next
+        </button>
+    </div>
 }
 
 @code {
@@ -110,12 +124,25 @@ else
     private string searchTerm = string.Empty;
     private bool pinnedOnly;
     private SortMode sortBy = SortMode.Newest;
+    private int currentPage = 1;
+    private int pageSize = 9;
 
     private IEnumerable<NoteDto> FilteredNotes =>
         ApplySorting(
             allNotes.Where(note =>
                 (!pinnedOnly || note.IsPinned) &&
                 MatchesSearch(note, searchTerm)));
+
+    private int FilteredCount => FilteredNotes.Count();
+
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling((double)FilteredCount / pageSize));
+
+    private int CurrentPage => Math.Min(currentPage, TotalPages);
+
+    private IEnumerable<NoteDto> PagedNotes =>
+        FilteredNotes
+            .Skip((CurrentPage - 1) * pageSize)
+            .Take(pageSize);
 
     protected override async Task OnInitializedAsync()
     {
@@ -222,6 +249,58 @@ else
         };
 
     private static string GetPinnedClass(bool isPinned) => isPinned ? "note-card-pinned" : string.Empty;
+
+    private void OnSearchChanged(ChangeEventArgs args)
+    {
+        searchTerm = args.Value?.ToString() ?? string.Empty;
+        ResetToFirstPage();
+    }
+
+    private Task OnPinnedOnlyChanged(bool value)
+    {
+        pinnedOnly = value;
+        ResetToFirstPage();
+        return Task.CompletedTask;
+    }
+
+    private void OnSortChanged(ChangeEventArgs args)
+    {
+        if (Enum.TryParse<SortMode>(args.Value?.ToString(), out var parsed))
+        {
+            sortBy = parsed;
+            ResetToFirstPage();
+        }
+    }
+
+    private void OnPageSizeChanged(ChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value?.ToString(), out var parsed) && parsed > 0)
+        {
+            pageSize = parsed;
+            ResetToFirstPage();
+        }
+    }
+
+    private void GoToPreviousPage()
+    {
+        if (CurrentPage > 1)
+        {
+            currentPage = CurrentPage - 1;
+        }
+    }
+
+    private void GoToNextPage()
+    {
+        if (CurrentPage < TotalPages)
+        {
+            currentPage = CurrentPage + 1;
+        }
+    }
+
+    private void ResetToFirstPage()
+    {
+        currentPage = 1;
+    }
 
     private enum SortMode
     {

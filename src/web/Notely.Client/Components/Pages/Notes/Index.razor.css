@@ -27,6 +27,10 @@
     width: 160px;
 }
 
+.notes-page-size {
+    width: 120px;
+}
+
 .notes-meta {
     color: #5c6672;
     margin-bottom: 0.75rem;
@@ -49,6 +53,19 @@
     box-shadow: 0 14px 30px rgba(245, 158, 11, 0.18);
 }
 
+.notes-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.notes-page-indicator {
+    color: #4b5563;
+    font-weight: 600;
+}
+
 @media (max-width: 768px) {
     .notes-toolbar {
         align-items: stretch;
@@ -59,7 +76,8 @@
     }
 
     .notes-search,
-    .notes-sort {
+    .notes-sort,
+    .notes-page-size {
         width: 100%;
     }
 }
