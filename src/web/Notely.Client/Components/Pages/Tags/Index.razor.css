@@ -1,0 +1,10 @@
+.tags-title {
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.tags-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}

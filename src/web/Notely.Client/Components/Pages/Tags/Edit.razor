@@ -1,0 +1,117 @@
+@page "/tags/edit/{id:guid}"
+@using Shared.DTOs
+@inject ITagsService TagsService
+@inject NavigationManager Navigation
+
+<PageTitle>Edit Tag</PageTitle>
+
+<h1>Edit Tag</h1>
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@if (updateTagDto == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-6">
+            <EditForm Model="@updateTagDto" OnValidSubmit="@HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <InputText id="title" class="form-control" @bind-Value="updateTagDto.Title" />
+                    <ValidationMessage For="@(() => updateTagDto.Title)" />
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary me-2" disabled="@isSubmitting">
+                        @if (isSubmitting)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        }
+                        Update Tag
+                    </button>
+                    <button type="button" class="btn btn-secondary" @onclick="Cancel">
+                        Cancel
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private UpdateTagDto? updateTagDto;
+    private bool isSubmitting;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTag();
+    }
+
+    private async Task LoadTag()
+    {
+        errorMessage = null;
+
+        try
+        {
+            var tag = await TagsService.GetTagAsync(Id);
+            if (tag == null)
+            {
+                Navigation.NavigateTo("/tags");
+                return;
+            }
+
+            updateTagDto = new UpdateTagDto
+            {
+                Title = tag.Title
+            };
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Unable to load tag.";
+            Console.WriteLine($"Error loading tag: {ex.Message}");
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (updateTagDto == null)
+        {
+            return;
+        }
+
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+            await TagsService.UpdateTagAsync(Id, updateTagDto);
+            Navigation.NavigateTo("/tags");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Unable to update tag. Please try a different title.";
+            Console.WriteLine($"Error updating tag: {ex.Message}");
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/tags");
+    }
+}

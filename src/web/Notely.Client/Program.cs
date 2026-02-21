@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Notely.Client;
 using Notely.Client.Services.Categories;
 using Notely.Client.Services.Notes;
+using Notely.Client.Services.Tags;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -16,6 +17,7 @@ builder.Services.AddScoped(sp => new HttpClient
 
 builder.Services.AddScoped<INotesService, NotesService>();
 builder.Services.AddScoped<ICategoriesService, CategoriesService>();
+builder.Services.AddScoped<ITagsService, TagsService>();
 
 await builder.Build().RunAsync();
 

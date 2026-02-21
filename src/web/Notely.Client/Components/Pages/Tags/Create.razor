@@ -1,0 +1,73 @@
+@page "/tags/create"
+@using Shared.DTOs
+@inject ITagsService TagsService
+@inject NavigationManager Navigation
+
+<PageTitle>Create Tag</PageTitle>
+
+<h1>Create Tag</h1>
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <EditForm Model="@createTagDto" OnValidSubmit="@HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <InputText id="title" class="form-control" @bind-Value="createTagDto.Title" />
+                <ValidationMessage For="@(() => createTagDto.Title)" />
+            </div>
+
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary me-2" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    }
+                    Save Tag
+                </button>
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">
+                    Cancel
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private readonly CreateTagDto createTagDto = new();
+    private bool isSubmitting;
+    private string? errorMessage;
+
+    private async Task HandleValidSubmit()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+            await TagsService.CreateTagAsync(createTagDto);
+            Navigation.NavigateTo("/tags");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Unable to create tag. Please try a different title.";
+            Console.WriteLine($"Error creating tag: {ex.Message}");
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/tags");
+    }
+}
