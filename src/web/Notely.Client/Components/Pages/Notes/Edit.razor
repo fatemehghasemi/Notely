@@ -3,6 +3,7 @@
 @using Notely.Client.Services.Notes
 @inject INotesService NotesService
 @inject ICategoriesService CategoriesService
+@inject ITagsService TagsService
 @inject NavigationManager Navigation
 
 <PageTitle>Edit Note</PageTitle>
@@ -55,6 +56,31 @@ else
                 </div>
 
                 <div class="mb-3">
+                    <label class="form-label">Tags</label>
+                    @if (availableTags.Any())
+                    {
+                        <div class="d-flex flex-wrap gap-2 mb-2">
+                            @foreach (var tag in availableTags.OrderBy(t => t.Title))
+                            {
+                                <div class="form-check form-check-inline">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        id="@($"tag_{tag.Id}")"
+                                        checked="@selectedTags.Contains(tag.Title)"
+                                        @onchange="(e) => OnTagCheckboxChanged(tag.Title, e)" />
+                                    <label class="form-check-label" for="@($"tag_{tag.Id}")">@tag.Title</label>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-text">No tags available. Create tags from the Tags page.</div>
+                    }
+                </div>
+
+                <div class="mb-3">
                     <button type="submit" class="btn btn-primary me-2" disabled="@isSubmitting">
                         @if (isSubmitting)
                         {
@@ -77,10 +103,12 @@ else
     private UpdateNoteDto? updateNoteDto;
     private bool isSubmitting = false;
     private IEnumerable<CategoryDto>? categories;
+    private IEnumerable<TagDto> availableTags = Enumerable.Empty<TagDto>();
+    private readonly HashSet<string> selectedTags = new(StringComparer.OrdinalIgnoreCase);
 
     protected override async Task OnInitializedAsync()
     {
-        await Task.WhenAll(LoadNote(), LoadCategories());
+        await Task.WhenAll(LoadNote(), LoadCategories(), LoadTags());
     }
 
     private async Task LoadCategories()
@@ -93,6 +121,19 @@ else
         {
             Console.WriteLine($"Error loading categories: {ex.Message}");
             categories = Enumerable.Empty<CategoryDto>();
+        }
+    }
+
+    private async Task LoadTags()
+    {
+        try
+        {
+            availableTags = await TagsService.GetTagsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading tags: {ex.Message}");
+            availableTags = Enumerable.Empty<TagDto>();
         }
     }
 
@@ -111,6 +152,12 @@ else
                     CategoryId = note.CategoryId,
                     Tags = note.Tags
                 };
+
+                selectedTags.Clear();
+                foreach (var tag in note.Tags)
+                {
+                    selectedTags.Add(tag);
+                }
             }
         }
         catch (Exception ex)
@@ -127,6 +174,7 @@ else
         isSubmitting = true;
         try
         {
+            ApplyTags();
             await NotesService.UpdateNoteAsync(Id, updateNoteDto);
             Navigation.NavigateTo("/notes");
         }
@@ -143,5 +191,27 @@ else
     private void Cancel()
     {
         Navigation.NavigateTo("/notes");
+    }
+
+    private void OnTagCheckboxChanged(string tagTitle, ChangeEventArgs args)
+    {
+        var isChecked = args.Value as bool? ?? false;
+        if (isChecked)
+        {
+            selectedTags.Add(tagTitle);
+            return;
+        }
+
+        selectedTags.Remove(tagTitle);
+    }
+
+    private void ApplyTags()
+    {
+        if (updateNoteDto == null)
+        {
+            return;
+        }
+
+        updateNoteDto.Tags = selectedTags.ToList();
     }
 }

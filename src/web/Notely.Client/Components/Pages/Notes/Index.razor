@@ -13,11 +13,11 @@
     <div class="notes-filters">
         <input
             class="form-control notes-search"
-            placeholder="Search by title, content, or category"
+            placeholder="Search by title, content, category, or tag"
             value="@searchTerm"
             @oninput="OnSearchChanged" />
         <div class="form-check">
-            <InputCheckbox id="pinnedOnly" class="form-check-input" Value="pinnedOnly" ValueChanged="OnPinnedOnlyChanged" />
+            <InputCheckbox id="pinnedOnly" class="form-check-input" @bind-Value="PinnedOnly" />
             <label for="pinnedOnly" class="form-check-label">Pinned only</label>
         </div>
         <select class="form-select notes-sort" value="@sortBy" @onchange="OnSortChanged">
@@ -87,6 +87,15 @@ else
                                 @note.Content
                             }
                         </p>
+                        @if (note.Tags.Any())
+                        {
+                            <div class="note-tags mb-2">
+                                @foreach (var tag in note.Tags)
+                                {
+                                    <span class="badge rounded-pill text-bg-light border me-1">#@tag</span>
+                                }
+                            </div>
+                        }
                         <small class="text-muted">
                             Created: @note.CreatedAt.ToString("MMM dd, yyyy")
                         </small>
@@ -138,6 +147,21 @@ else
     private int TotalPages => Math.Max(1, (int)Math.Ceiling((double)FilteredCount / pageSize));
 
     private int CurrentPage => Math.Min(currentPage, TotalPages);
+
+    private bool PinnedOnly
+    {
+        get => pinnedOnly;
+        set
+        {
+            if (pinnedOnly == value)
+            {
+                return;
+            }
+
+            pinnedOnly = value;
+            ResetToFirstPage();
+        }
+    }
 
     private IEnumerable<NoteDto> PagedNotes =>
         FilteredNotes
@@ -237,7 +261,8 @@ else
         var query = term.Trim();
         return (note.Title?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
             || (note.Content?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
-            || (note.CategoryName?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false);
+            || (note.CategoryName?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
+            || note.Tags.Any(tag => tag.Contains(query, StringComparison.OrdinalIgnoreCase));
     }
 
     private IEnumerable<NoteDto> ApplySorting(IEnumerable<NoteDto> notes) =>
@@ -254,13 +279,6 @@ else
     {
         searchTerm = args.Value?.ToString() ?? string.Empty;
         ResetToFirstPage();
-    }
-
-    private Task OnPinnedOnlyChanged(bool value)
-    {
-        pinnedOnly = value;
-        ResetToFirstPage();
-        return Task.CompletedTask;
     }
 
     private void OnSortChanged(ChangeEventArgs args)
