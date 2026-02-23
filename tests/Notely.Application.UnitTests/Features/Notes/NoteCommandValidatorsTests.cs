@@ -28,7 +28,8 @@ public class NoteCommandValidatorsTests
         var validator = new CreateNoteCommandValidator(new TestStringLocalizer<CreateNoteCommandValidator>());
         var command = new CreateNoteCommand(
             Title: string.Empty,
-            Content: "Content is present");
+            Content: "Content is present",
+            CategoryId: Guid.NewGuid());
 
         var result = validator.Validate(command);
 
@@ -43,12 +44,13 @@ public class NoteCommandValidatorsTests
         var command = new CreateNoteCommand(
             Title: "Valid title",
             Content: "Valid content",
+            CategoryId: Guid.NewGuid(),
             Tags: ["valid-tag", " "]);
 
         var result = validator.Validate(command);
 
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.PropertyName == "Tags");
+        result.Errors.Should().Contain(e => e.PropertyName.StartsWith("Tags"));
     }
 
     [Fact]
