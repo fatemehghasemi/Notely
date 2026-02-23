@@ -24,6 +24,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notely.Server", "src\web\No
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notely.Client", "src\web\Notely.Client\Notely.Client.csproj", "{1D86A2CB-F226-4C68-BBF5-77DB766869B2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A60ECF3A-D73A-E315-1127-27E64F6DA120}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notely.Application.UnitTests", "tests\Notely.Application.UnitTests\Notely.Application.UnitTests.csproj", "{F3EDCBBB-4FA8-4CA6-A795-1C8BF00AFE21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +58,10 @@ Global
 		{1D86A2CB-F226-4C68-BBF5-77DB766869B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D86A2CB-F226-4C68-BBF5-77DB766869B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D86A2CB-F226-4C68-BBF5-77DB766869B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3EDCBBB-4FA8-4CA6-A795-1C8BF00AFE21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3EDCBBB-4FA8-4CA6-A795-1C8BF00AFE21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3EDCBBB-4FA8-4CA6-A795-1C8BF00AFE21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3EDCBBB-4FA8-4CA6-A795-1C8BF00AFE21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,6 +77,7 @@ Global
 		{193163F0-D1B3-422B-AF6C-7A81EF2635D6} = {ACE3B5F6-02E0-E5E3-B283-044C1171AFDE}
 		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890} = {30FFE51C-FFF5-43FE-A105-E4EFBE7D07C5}
 		{1D86A2CB-F226-4C68-BBF5-77DB766869B2} = {30FFE51C-FFF5-43FE-A105-E4EFBE7D07C5}
+		{F3EDCBBB-4FA8-4CA6-A795-1C8BF00AFE21} = {A60ECF3A-D73A-E315-1127-27E64F6DA120}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A70D825-43D1-4601-9632-5E69FAC65F2A}
