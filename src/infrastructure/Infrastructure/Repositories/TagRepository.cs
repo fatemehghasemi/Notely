@@ -31,4 +31,12 @@ public sealed class TagRepository : BaseRepository<Tag, Guid>, ITagRepository
             .ThenInclude(nt => nt.Note)
             .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
     }
+    public async Task<List<Tag>> GetByTitlesAsync(
+    IEnumerable<string> titles,
+    CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+          .Where(t => titles.Contains(t.Title))
+          .ToListAsync(cancellationToken);
+    }
 }

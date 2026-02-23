@@ -18,52 +18,66 @@ public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Resul
         _tagRepository = tagRepository;
     }
 
-    public async Task<Result<NoteResponse>> Handle(CreateNoteCommand request, CancellationToken cancellationToken)
+    public async Task<Result<NoteResponse>> Handle(
+        CreateNoteCommand request,
+        CancellationToken cancellationToken)
     {
         try
         {
             var note = new Note
             {
                 Id = Guid.NewGuid(),
-                Title = request.Title,
-                Content = request.Content,
+                Title = request.Title.Trim(),
+                Content = request.Content.Trim(),
                 IsPinned = request.IsPinned,
                 CategoryId = request.CategoryId
             };
 
             if (request.Tags?.Any() == true)
             {
-                var noteTags = new List<NoteTag>();
-                
-                foreach (var tagTitle in request.Tags)
+                var normalizedTags = request.Tags
+                    .Where(t => !string.IsNullOrWhiteSpace(t))
+                    .Select(t => t.Trim())
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                var existingTags = (await _tagRepository
+                    .GetByTitlesAsync(normalizedTags, cancellationToken))
+                    .ToList();
+
+                var existingTitles = existingTags
+                    .Select(t => t.Title)
+                    .ToList();
+
+                var missingTitles = normalizedTags
+                    .Except(existingTitles, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                foreach (var title in missingTitles)
                 {
-                    var existingTag = await _tagRepository.GetByTitleAsync(tagTitle, cancellationToken);
-                    
-                    if (existingTag == null)
-                    {
-                        existingTag = new Tag
+                    var newTag = await _tagRepository.AddAsync(
+                        new Tag
                         {
                             Id = Guid.NewGuid(),
-                            Title = tagTitle
-                        };
-                        existingTag = await _tagRepository.AddAsync(existingTag, cancellationToken);
-                    }
+                            Title = title
+                        },
+                        cancellationToken);
 
-                    noteTags.Add(new NoteTag
-                    {
-                        NoteId = note.Id,
-                        TagId = existingTag.Id
-                    });
+                    existingTags.Add(newTag);
                 }
 
-                note.NoteTags = noteTags;
+                note.NoteTags = existingTags
+                    .Select(tag => new NoteTag
+                    {
+                        NoteId = note.Id,
+                        TagId = tag.Id
+                    })
+                    .ToList();
             }
 
             var createdNote = await _noteRepository.AddAsync(note, cancellationToken);
 
-            var response = createdNote.Adapt<NoteResponse>();
-
-            return Result<NoteResponse>.Success(response);
+            return Result<NoteResponse>.Success(createdNote.Adapt<NoteResponse>());
         }
         catch (Exception ex)
         {
