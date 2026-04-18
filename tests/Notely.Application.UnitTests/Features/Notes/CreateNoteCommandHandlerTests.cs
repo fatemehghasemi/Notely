@@ -73,4 +73,58 @@ public class CreateNoteCommandHandlerTests
                 It.IsAny<CancellationToken>()),
             Times.Once);
     }
+
+    [Fact]
+    public async Task Should_Create_Note_Without_Tags_And_Not_Call_TagRepository()
+    {
+        var command = new CreateNoteCommand(
+            Title: "  Title  ",
+            Content: "  Content  ");
+
+        _noteRepositoryMock
+            .Setup(x => x.AddAsync(It.IsAny<Note>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Note n, CancellationToken _) => n);
+
+        var handler = CreateHandler();
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+
+        _tagRepositoryMock.Verify(
+            x => x.GetByTitlesAsync(It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+
+        _tagRepositoryMock.Verify(
+            x => x.AddAsync(It.IsAny<Tag>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+
+        _noteRepositoryMock.Verify(
+            x => x.AddAsync(
+                It.Is<Note>(n =>
+                    n.Title == "Title" &&
+                    n.Content == "Content" &&
+                    (n.NoteTags == null || n.NoteTags.Count == 0)),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task Should_Return_Failure_When_Repository_Throws()
+    {
+        var command = new CreateNoteCommand(
+            Title: "Title",
+            Content: "Content");
+
+        _noteRepositoryMock
+            .Setup(x => x.AddAsync(It.IsAny<Note>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("db error"));
+
+        var handler = CreateHandler();
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        result.IsSuccess.Should().BeFalse();
+        result.ErrorMessage.Should().Contain("Failed to create note: db error");
+    }
 }
