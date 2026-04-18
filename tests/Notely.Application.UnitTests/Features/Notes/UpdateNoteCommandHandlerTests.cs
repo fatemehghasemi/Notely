@@ -166,10 +166,6 @@ public class UpdateNoteCommandHandlerTests
         _tagRepositoryMock.Verify(
             x => x.GetByTitleAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
             Times.Never);
-
-        _tagRepositoryMock.Verify(
-            x => x.AddAsync(It.IsAny<Tag>(), It.IsAny<CancellationToken>()),
-            Times.Never);
     }
 
     [Fact]

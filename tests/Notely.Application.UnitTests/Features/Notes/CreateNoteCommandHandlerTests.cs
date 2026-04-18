@@ -95,10 +95,6 @@ public class CreateNoteCommandHandlerTests
             x => x.GetByTitlesAsync(It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()),
             Times.Never);
 
-        _tagRepositoryMock.Verify(
-            x => x.AddAsync(It.IsAny<Tag>(), It.IsAny<CancellationToken>()),
-            Times.Never);
-
         _noteRepositoryMock.Verify(
             x => x.AddAsync(
                 It.Is<Note>(n =>

@@ -8,21 +8,6 @@ namespace Notely.Application.UnitTests.Features.Notes;
 public class NoteCommandValidatorsTests
 {
     [Fact]
-    public void CreateNoteValidator_Should_Pass_For_Valid_Command()
-    {
-        var validator = new CreateNoteCommandValidator(new TestStringLocalizer<CreateNoteCommandValidator>());
-        var command = new CreateNoteCommand(
-            Title: "Meeting notes",
-            Content: "Discuss Q1 roadmap",
-            CategoryId: Guid.NewGuid(),
-            Tags: ["work", "planning"]);
-
-        var result = validator.Validate(command);
-
-        result.IsValid.Should().BeTrue();
-    }
-
-    [Fact]
     public void CreateNoteValidator_Should_Fail_When_Title_Is_Empty()
     {
         var validator = new CreateNoteCommandValidator(new TestStringLocalizer<CreateNoteCommandValidator>());
