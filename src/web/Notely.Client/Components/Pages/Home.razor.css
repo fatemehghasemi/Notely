@@ -1,0 +1,125 @@
+.home-shell {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 1.5rem 0 2.5rem;
+    animation: home-fade 0.45s ease-out;
+}
+
+.hero-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--notely-border);
+    border-radius: 22px;
+    padding: 2rem;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(227, 139, 44, 0.25), transparent 45%),
+        linear-gradient(140deg, #ffffff, #f6faf8 55%, #edf5f0);
+    box-shadow: 0 16px 38px rgba(22, 36, 35, 0.12);
+}
+
+.eyebrow {
+    margin: 0 0 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--notely-primary);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.hero-card h1 {
+    margin: 0 0 0.7rem;
+    font-size: clamp(1.9rem, 4vw, 2.8rem);
+    line-height: 1.1;
+}
+
+.subtitle {
+    max-width: 720px;
+    color: var(--notely-muted);
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.hero-actions .btn {
+    min-width: 150px;
+    border-radius: 12px;
+    font-weight: 700;
+    padding: 0.65rem 1rem;
+}
+
+.feature-grid {
+    margin-top: 1.5rem;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.feature-card {
+    background: var(--notely-surface);
+    border: 1px solid var(--notely-border);
+    border-radius: 16px;
+    padding: 1.15rem;
+    box-shadow: 0 8px 22px rgba(16, 36, 33, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(16, 36, 33, 0.12);
+}
+
+.feature-badge {
+    display: inline-block;
+    margin-bottom: 0.5rem;
+    background: var(--notely-surface-soft);
+    color: var(--notely-primary-strong);
+    border-radius: 999px;
+    padding: 0.18rem 0.6rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.feature-card h3 {
+    font-size: 1.08rem;
+    margin-bottom: 0.35rem;
+}
+
+.feature-card p {
+    margin-bottom: 0;
+    color: var(--notely-muted);
+}
+
+.quick-links {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.quick-links a {
+    text-decoration: none;
+    color: var(--notely-primary-strong);
+    font-weight: 700;
+}
+
+@media (max-width: 900px) {
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@keyframes home-fade {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
