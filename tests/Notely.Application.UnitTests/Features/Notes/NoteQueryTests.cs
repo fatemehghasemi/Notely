@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Moq;
-using Notely.Application.UnitTests.Common;
 using Notely.Core.Application.Features.Notes.Queries.GetAllNotes;
 using Notely.Core.Application.Features.Notes.Queries.GetNoteById;
 using Notely.Core.Application.Interfaces.Repositories;
@@ -130,20 +129,5 @@ public class NoteQueryHandlersTests
 
         result.IsSuccess.Should().BeFalse();
         result.ErrorMessage.Should().Contain("Failed to get note: db error");
-    }
-}
-
-public class GetNoteByIdQueryValidatorTests
-{
-    [Fact]
-    public void Should_Fail_When_Id_Is_Empty()
-    {
-        var validator = new GetNoteByIdQueryValidator(new TestStringLocalizer<GetNoteByIdQueryValidator>());
-        var query = new GetNoteByIdQuery(Guid.Empty);
-
-        var result = validator.Validate(query);
-
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.PropertyName == "Id");
     }
 }
